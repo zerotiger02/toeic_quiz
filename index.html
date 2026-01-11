@@ -1,0 +1,2654 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>토익 영단어 시험 프로그램</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            max-width: 1400px;
+            width: 100%;
+            margin: 0 auto;
+            padding: 40px;
+        }
+
+        h1 {
+            color: #667eea;
+            text-align: center;
+            margin-bottom: 30px;
+            font-size: 2.5em;
+        }
+
+        /* Day Selection Section */
+        .day-selection-section {
+            margin-bottom: 30px;
+        }
+
+        .mode-selection {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 30px;
+            justify-content: center;
+        }
+
+        .mode-btn {
+            padding: 15px 30px;
+            border: 2px solid #667eea;
+            background: white;
+            color: #667eea;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: bold;
+            transition: all 0.3s;
+        }
+
+        .mode-btn:hover {
+            background: #667eea;
+            color: white;
+            transform: translateY(-2px);
+        }
+
+        .mode-btn.active {
+            background: #667eea;
+            color: white;
+        }
+
+        .day-grid {
+            display: grid;
+            grid-template-columns: repeat(10, 1fr);
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        @media (max-width: 768px) {
+            .day-grid {
+                grid-template-columns: repeat(5, 1fr);
+                gap: 8px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .day-grid {
+                grid-template-columns: repeat(4, 1fr);
+                gap: 8px;
+            }
+        }
+
+        .day-checkbox {
+            display: none;
+        }
+
+        .day-label {
+            padding: 12px;
+            background: #f0f0f0;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: bold;
+            font-size: 14px;
+        }
+
+        .day-label:hover {
+            background: #e8e8ff;
+            border-color: #667eea;
+        }
+
+        .day-checkbox:checked + .day-label {
+            background: #667eea;
+            color: white;
+            border-color: #667eea;
+        }
+
+        .control-buttons {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            margin-bottom: 20px;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            background: #667eea;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: bold;
+            transition: all 0.3s;
+        }
+
+        .btn:hover {
+            background: #5568d3;
+            transform: translateY(-2px);
+        }
+
+        .btn-secondary {
+            background: #48dbfb;
+        }
+
+        .btn-secondary:hover {
+            background: #0abde3;
+        }
+
+        .selected-info {
+            text-align: center;
+            font-size: 16px;
+            color: #666;
+            margin-bottom: 20px;
+        }
+
+        /* Quiz Section */
+        .quiz-section {
+            display: none;
+        }
+
+        .quiz-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding: 15px;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .progress-info {
+            font-size: 18px;
+            color: #667eea;
+            font-weight: bold;
+        }
+
+        .quiz-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 15px;
+            margin-bottom: 20px;
+            padding: 10px;
+        }
+
+        @media (max-width: 1024px) {
+            .quiz-grid {
+                grid-template-columns: repeat(3, 1fr);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .quiz-grid {
+                grid-template-columns: repeat(3, 1fr);
+                gap: 6px;
+            }
+            
+            .question-card {
+                padding: 6px;
+            }
+            
+            .question-number {
+                font-size: 9px;
+                padding: 2px 6px;
+                margin-bottom: 4px;
+            }
+            
+            .question-text {
+                font-size: 0.75em;
+                min-height: 30px;
+                margin-bottom: 6px;
+            }
+            
+            .meaning-count {
+                font-size: 9px;
+                margin-bottom: 4px;
+            }
+            
+            .answer-input {
+                padding: 5px;
+                font-size: 11px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .quiz-grid {
+                grid-template-columns: repeat(3, 1fr);
+                gap: 4px;
+            }
+            
+            .question-card {
+                padding: 5px;
+            }
+            
+            .question-number {
+                font-size: 8px;
+                padding: 2px 5px;
+                margin-bottom: 3px;
+            }
+            
+            .question-text {
+                font-size: 0.7em;
+                min-height: 25px;
+                margin-bottom: 5px;
+            }
+            
+            .meaning-count {
+                font-size: 8px;
+                margin-bottom: 3px;
+            }
+            
+            .answer-input {
+                padding: 4px;
+                font-size: 10px;
+            }
+        }
+
+        .question-card {
+            background: white;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            padding: 15px;
+            transition: all 0.3s;
+        }
+
+        .question-card:hover {
+            border-color: #667eea;
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.2);
+        }
+
+        .question-number {
+            display: inline-block;
+            background: #667eea;
+            color: white;
+            padding: 4px 10px;
+            border-radius: 15px;
+            font-weight: bold;
+            font-size: 12px;
+            margin-bottom: 8px;
+        }
+
+        .question-text {
+            font-size: 1.2em;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 10px;
+            min-height: 50px;
+            display: flex;
+            align-items: center;
+        }
+
+        .meaning-count {
+            font-size: 12px;
+            color: #888;
+            margin-bottom: 8px;
+        }
+
+        .answer-input {
+            width: 100%;
+            padding: 10px;
+            font-size: 14px;
+            border: 2px solid #e0e0e0;
+            border-radius: 6px;
+            transition: all 0.3s;
+        }
+
+        .answer-input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .answer-input.correct {
+            border-color: #2ecc71;
+            background-color: #d4edda;
+        }
+
+        .answer-input.incorrect {
+            border-color: #e74c3c;
+            background-color: #f8d7da;
+        }
+
+        .answer-input.partial {
+            border-color: #3498db;
+            background-color: #d6eaf8;
+        }
+
+        .hint-btn {
+            margin-top: 8px;
+            padding: 6px 12px;
+            background: #ffa502;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 12px;
+            width: 100%;
+        }
+
+        .hint-btn:hover {
+            background: #ff7f00;
+        }
+
+        .hint-btn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+
+        .hint-text {
+            margin-top: 8px;
+            font-size: 12px;
+            color: #ffa502;
+            font-weight: bold;
+        }
+
+        .correct-answer {
+            margin-top: 8px;
+            font-size: 12px;
+            color: #e74c3c;
+            font-weight: bold;
+        }
+
+        .submit-btn {
+            width: 100%;
+            padding: 15px;
+            background: #667eea;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 18px;
+            font-weight: bold;
+            transition: all 0.3s;
+        }
+
+        .submit-btn:hover {
+            background: #5568d3;
+            transform: translateY(-2px);
+        }
+
+        /* Study Mode Styles */
+        .study-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+            margin-bottom: 20px;
+            padding: 10px;
+        }
+
+        @media (max-width: 1024px) {
+            .study-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .study-grid {
+                grid-template-columns: 1fr;
+                gap: 10px;
+            }
+        }
+
+        .study-card {
+            background: white;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            padding: 20px;
+            transition: all 0.3s;
+            cursor: pointer;
+        }
+
+        .study-card:hover {
+            border-color: #667eea;
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.2);
+        }
+
+        .study-english {
+            font-size: 1.5em;
+            font-weight: bold;
+            color: #667eea;
+            margin-bottom: 10px;
+        }
+
+        .study-korean {
+            font-size: 1.1em;
+            color: #555;
+            line-height: 1.6;
+        }
+
+        .study-english.hidden,
+        .study-korean.hidden {
+            filter: blur(10px) !important;
+            user-select: none;
+            cursor: pointer;
+            transition: filter 0.3s;
+            opacity: 0.6 !important;
+        }
+
+        .study-english.hidden.revealed,
+        .study-korean.hidden.revealed {
+            filter: none !important;
+            cursor: default;
+            opacity: 1 !important;
+        }
+
+        /* Result Section */
+        .result-section {
+            display: none;
+        }
+
+        .result-header {
+            position: relative;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .score-display {
+            font-size: 4em;
+            color: #667eea;
+            margin: 20px 0;
+            font-weight: bold;
+        }
+
+        .score-message {
+            font-size: 1.8em;
+            margin-bottom: 20px;
+            color: #333;
+        }
+
+        .result-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 15px;
+            margin-bottom: 20px;
+            padding: 10px;
+        }
+
+        @media (max-width: 1024px) {
+            .result-grid {
+                grid-template-columns: repeat(3, 1fr);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .result-grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 10px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .result-grid {
+                grid-template-columns: 1fr;
+                gap: 10px;
+            }
+        }
+
+        .result-card {
+            background: white;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            padding: 15px;
+            transition: all 0.3s;
+        }
+
+        .result-card.correct {
+            border-color: #2ecc71;
+            background: #f0fff4;
+        }
+
+        .result-card.incorrect {
+            border-color: #e74c3c;
+            background: #fff5f5;
+        }
+
+        .result-card.partial {
+            border-color: #3498db;
+            background: #ebf5fb;
+        }
+
+        .result-number {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 15px;
+            font-weight: bold;
+            font-size: 12px;
+            margin-bottom: 8px;
+            color: white;
+        }
+
+        .result-number.correct {
+            background: #2ecc71;
+        }
+
+        .result-number.incorrect {
+            background: #e74c3c;
+        }
+
+        .result-number.partial {
+            background: #3498db;
+        }
+
+        .result-question {
+            font-size: 1.2em;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 10px;
+            min-height: 50px;
+            display: flex;
+            align-items: center;
+        }
+
+        .result-answer-section {
+            font-size: 14px;
+            line-height: 1.6;
+        }
+
+        .user-answer {
+            color: #666;
+            margin-bottom: 5px;
+        }
+
+        .correct-answer-display {
+            color: #2ecc71;
+            font-weight: bold;
+        }
+
+        .wrong-answer-display {
+            color: #e74c3c;
+            font-weight: bold;
+        }
+
+        .partial-answer-display {
+            color: #3498db;
+            font-weight: bold;
+        }
+
+        .meaning-item {
+            margin: 3px 0;
+            font-size: 13px;
+        }
+
+        .meaning-matched {
+            color: #2ecc71;
+        }
+
+        .meaning-matched::before {
+            content: '● ';
+            font-size: 10px;
+        }
+
+        .meaning-unmatched {
+            color: #e74c3c;
+        }
+
+        .result-buttons {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            margin-top: 30px;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 20px;
+            }
+
+            h1 {
+                font-size: 1.8em;
+            }
+
+            .mode-selection {
+                flex-direction: column;
+                gap: 10px;
+            }
+
+            .mode-btn {
+                width: 100%;
+            }
+
+            .control-buttons {
+                flex-direction: column;
+            }
+
+            .btn {
+                width: 100%;
+            }
+
+            .day-label {
+                padding: 10px 8px;
+                font-size: 13px;
+            }
+
+            .quiz-header {
+                flex-direction: column;
+                gap: 10px;
+            }
+
+            .result-buttons {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1 id="mainTitle">📚 토익 영단어 시험 프로그램</h1>
+
+        <!-- Category Selection -->
+        <div class="mode-selection" id="categorySelection" style="margin-bottom: 20px;">
+            <button class="mode-btn active" data-category="meaning">뜻 작성하기</button>
+            <button class="mode-btn" data-category="english">영어 작성하기</button>
+            <button class="mode-btn" data-category="study">단어 연습</button>
+        </div>
+
+        <!-- Day Selection Section -->
+        <div class="day-selection-section" id="daySelectionSection">
+            <h3 style="text-align: center; margin-bottom: 20px; color: #667eea;">Day 선택 (복수 선택 가능)</h3>
+            
+            <div class="day-grid" id="dayGrid">
+                <input type="checkbox" class="day-checkbox" id="day1" value="Day1">
+                <label for="day1" class="day-label">Day1</label>
+                
+                <input type="checkbox" class="day-checkbox" id="day2" value="Day2">
+                <label for="day2" class="day-label">Day2</label>
+                
+                <input type="checkbox" class="day-checkbox" id="day3" value="Day3">
+                <label for="day3" class="day-label">Day3</label>
+                
+                <input type="checkbox" class="day-checkbox" id="day4" value="Day4">
+                <label for="day4" class="day-label">Day4</label>
+                
+                <input type="checkbox" class="day-checkbox" id="day5" value="Day5">
+                <label for="day5" class="day-label">Day5</label>
+                
+                <input type="checkbox" class="day-checkbox" id="day6" value="Day6">
+                <label for="day6" class="day-label">Day6</label>
+                
+                <input type="checkbox" class="day-checkbox" id="day7" value="Day7">
+                <label for="day7" class="day-label">Day7</label>
+                
+                <input type="checkbox" class="day-checkbox" id="day8" value="Day8">
+                <label for="day8" class="day-label">Day8</label>
+                
+                <input type="checkbox" class="day-checkbox" id="day9" value="Day9">
+                <label for="day9" class="day-label">Day9</label>
+                
+                <input type="checkbox" class="day-checkbox" id="day10" value="Day10">
+                <label for="day10" class="day-label">Day10</label>
+                
+                <input type="checkbox" class="day-checkbox" id="day11" value="Day11">
+                <label for="day11" class="day-label">Day11</label>
+                
+                <input type="checkbox" class="day-checkbox" id="day12" value="Day12">
+                <label for="day12" class="day-label">Day12</label>
+                
+                <input type="checkbox" class="day-checkbox" id="day13" value="Day13">
+                <label for="day13" class="day-label">Day13</label>
+                
+                <input type="checkbox" class="day-checkbox" id="day14" value="Day14">
+                <label for="day14" class="day-label">Day14</label>
+                
+                <input type="checkbox" class="day-checkbox" id="day15" value="Day15">
+                <label for="day15" class="day-label">Day15</label>
+                
+                <input type="checkbox" class="day-checkbox" id="day16" value="Day16">
+                <label for="day16" class="day-label">Day16</label>
+                
+                <input type="checkbox" class="day-checkbox" id="day17" value="Day17">
+                <label for="day17" class="day-label">Day17</label>
+                
+                <input type="checkbox" class="day-checkbox" id="day18" value="Day18">
+                <label for="day18" class="day-label">Day18</label>
+                
+                <input type="checkbox" class="day-checkbox" id="day19" value="Day19">
+                <label for="day19" class="day-label">Day19</label>
+                
+                <input type="checkbox" class="day-checkbox" id="day20" value="Day20">
+                <label for="day20" class="day-label">Day20</label>
+                
+                <input type="checkbox" class="day-checkbox" id="day21" value="Day21">
+                <label for="day21" class="day-label">Day21</label>
+                
+                <input type="checkbox" class="day-checkbox" id="day22" value="Day22">
+                <label for="day22" class="day-label">Day22</label>
+                
+                <input type="checkbox" class="day-checkbox" id="day23" value="Day23">
+                <label for="day23" class="day-label">Day23</label>
+                
+                <input type="checkbox" class="day-checkbox" id="day24" value="Day24">
+                <label for="day24" class="day-label">Day24</label>
+                
+                <input type="checkbox" class="day-checkbox" id="day25" value="Day25">
+                <label for="day25" class="day-label">Day25</label>
+                
+                <input type="checkbox" class="day-checkbox" id="day26" value="Day26">
+                <label for="day26" class="day-label">Day26</label>
+                
+                <input type="checkbox" class="day-checkbox" id="day27" value="Day27">
+                <label for="day27" class="day-label">Day27</label>
+                
+                <input type="checkbox" class="day-checkbox" id="day28" value="Day28">
+                <label for="day28" class="day-label">Day28</label>
+                
+                <input type="checkbox" class="day-checkbox" id="day29" value="Day29">
+                <label for="day29" class="day-label">Day29</label>
+                
+                <input type="checkbox" class="day-checkbox" id="day30" value="Day30">
+                <label for="day30" class="day-label">Day30</label>
+            </div>
+
+            <div class="control-buttons">
+                <button class="btn btn-secondary" id="selectAllBtn">전체 선택</button>
+                <button class="btn btn-secondary" id="deselectAllBtn">전체 해제</button>
+            </div>
+
+            <div class="selected-info" id="selectedInfo">선택된 Day: 없음</div>
+
+            <div style="text-align: center;">
+                <button class="btn" id="startQuizBtn">시험 시작</button>
+            </div>
+        </div>
+
+        <!-- Quiz Section -->
+        <div class="quiz-section" id="quizSection">
+            <div class="quiz-header">
+                <div class="progress-info" id="progressInfo"></div>
+                <button class="btn btn-secondary" id="backToSelectionBtn">Day 선택으로 돌아가기</button>
+            </div>
+
+            <div class="mode-selection" id="studyModeButtons" style="display: none; margin-bottom: 20px;">
+                <button class="mode-btn active" data-study-mode-active="show-all">전체 보기</button>
+                <button class="mode-btn" data-study-mode-active="hide-english">영어 가리기</button>
+                <button class="mode-btn" data-study-mode-active="hide-korean">뜻 가리기</button>
+            </div>
+
+            <div class="quiz-grid" id="quizGrid"></div>
+
+            <button class="submit-btn" id="submitBtn">채점하기</button>
+        </div>
+
+        <!-- Result Section -->
+        <div class="result-section" id="resultSection">
+            <div class="result-header">
+                <h2>🎉 시험 완료!</h2>
+                <div class="score-display" id="scoreDisplay"></div>
+                <div class="score-message" id="scoreMessage"></div>
+            </div>
+
+            <div class="result-grid" id="resultGrid"></div>
+
+            <div class="result-buttons">
+                <button class="btn" id="retryWrongBtn">틀린 문제 다시 풀기</button>
+                <button class="btn btn-secondary" id="newQuizBtn">새로운 시험</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Vocabulary Data
+        const vocabData = {
+            'Day1': [
+                { english: 'resume', korean: '이력서' },
+                { english: 'opening', korean: '공석, 결원, 개장, 개시' },
+                { english: 'applicant', korean: '지원자, 신청자' },
+                { english: 'requirement', korean: '필요조건, 요건' },
+                { english: 'meet', korean: '(필요, 요구 등을) 만족시키다' },
+                { english: 'qualified', korean: '자격 있는, 적격의' },
+                { english: 'candidate', korean: '후보자, 지원자' },
+                { english: 'confidence', korean: '확신, 자신, 신임' },
+                { english: 'highly', korean: '매우, 대단히' },
+                { english: 'professional', korean: '전문적인, 직업의, 전문가' },
+                { english: 'interview', korean: '면접, 면접을 보다' },
+                { english: 'hire', korean: '고용하다' },
+                { english: 'training', korean: '교육, 훈련' },
+                { english: 'reference', korean: '추천서, 참고' },
+                { english: 'position', korean: '일자리, 직책, 두다' },
+                { english: 'achievement', korean: '성취, 달성' },
+                { english: 'impressed', korean: '인상 깊게 생각하는, 감명을 받은' },
+                { english: 'excellent', korean: '훌륭한, 탁월한' },
+                { english: 'eligible', korean: '자격이 있는, 적격의' },
+                { english: 'identify', korean: '알아보다, 확인하다' },
+                { english: 'associate', korean: '관련시키다' },
+                { english: 'condition', korean: '조건' },
+                { english: 'employment', korean: '고용' },
+                { english: 'lack', korean: '~이 없다, 부족' },
+                { english: 'managerial', korean: '관리의' },
+                { english: 'diligent', korean: '성실한' },
+                { english: 'familiar', korean: '익숙한, 친숙한' },
+                { english: 'proficiency', korean: '숙달, 능숙' },
+                { english: 'prospective', korean: '장래의, 미래의' },
+                { english: 'appeal', korean: '관심을 끌다, 매력적이다' },
+                { english: 'specialize', korean: '~을 전공하다, 전문적으로 다루다' },
+                { english: 'apprehensive', korean: '걱정하는, 염려하는' },
+                { english: 'consultant', korean: '고문, 컨설턴트' },
+                { english: 'entitle', korean: '자격을 주다' },
+                { english: 'degree', korean: '학위' },
+                { english: 'payroll', korean: '임금 대장, 급료 명부' },
+                { english: 'recruit', korean: '(신입 사원 등을) 모집하다' },
+                { english: 'certification', korean: '증명서, 증명' },
+                { english: 'occupation', korean: '작업' },
+                { english: 'wage', korean: '임금, 급료' }
+            ],
+            'Day2': [
+                { english: 'attire', korean: '복장, 옷차림새' },
+                { english: 'code', korean: '규범, 관례, 암호' },
+                { english: 'concern', korean: '우려, 걱정, 문제, 일, ~을 걱정스럽게 하다, 영향을 미치다, 관련되다' },
+                { english: 'policy', korean: '규정, 보험 증권' },
+                { english: 'comply', korean: '준수하다, 따르다' },
+                { english: 'regulation', korean: '규정' },
+                { english: 'exception', korean: '예외' },
+                { english: 'adhere', korean: '지키다, 고수하다' },
+                { english: 'severely', korean: '엄격하게, 심하게' },
+                { english: 'refrain', korean: '자제하다, 삼가다' },
+                { english: 'permission', korean: '허락, 허가' },
+                { english: 'access', korean: '이용 권한, 접근, 통로, ~에 접근하다, 도달하다' },
+                { english: 'thoroughly', korean: '철저하게, 완전히, 대단히' },
+                { english: 'revise', korean: '(의견, 계획을) 수정하다, 변경하다' },
+                { english: 'approach', korean: '접근법, 처리 방법, 다가오다, 가까워지다' },
+                { english: 'approval', korean: '승인, 인가' },
+                { english: 'form', korean: '종류, 유형, 양식' },
+                { english: 'immediately', korean: '즉시, 곧' },
+                { english: 'inspection', korean: '점검, 검사' },
+                { english: 'arrangement', korean: '준비, 마련, 주선' },
+                { english: 'procedure', korean: '절차' },
+                { english: 'negative', korean: '부정적인, 비관적인' },
+                { english: 'mandate', korean: '명령하다, 지시하다, 권한, 지시, 명령' },
+                { english: 'effect', korean: '(법률 등의) 효력, 효과, 영향, 결과로서 ~을 가져오다' },
+                { english: 'drastically', korean: '심하게, 과감하게, 철저하게' },
+                { english: 'according to', korean: '~에 따라' },
+                { english: 'enable', korean: '(무엇을) 가능하게 하다' },
+                { english: 'standard', korean: '기준, 표준' },
+                { english: 'constant', korean: '지속적인, 끊임없이 계속하는' },
+                { english: 'act', korean: '법령, 결의서, 행동, 행위, 결정하다, 판결을 내리다, 행동하다' },
+                { english: 'compensation', korean: '보상금, 보상' },
+                { english: 'ban', korean: '금지, 금지하다' },
+                { english: 'obligation', korean: '의무, 책임' },
+                { english: 'authorize', korean: '~을 인가하다, 권한을 부여하다' },
+                { english: 'prohibit', korean: '금지하다' },
+                { english: 'abolish', korean: '(제도, 법률 등을) 폐지하다' },
+                { english: 'enforce', korean: '(법률을) 시행하다, 집행하다' },
+                { english: 'habit', korean: '습관, 버릇' },
+                { english: 'legislation', korean: '법률, 법규' },
+                { english: 'restrict', korean: '한정하다, 제한하다' }
+            ],
+            'Day3': [
+                { english: 'accustomed', korean: '익숙한' },
+                { english: 'corporation', korean: '주식회사, 법인' },
+                { english: 'demanding', korean: '요구가 많은, 힘든' },
+                { english: 'colleague', korean: '(직업상의) 동료' },
+                { english: 'division', korean: '부서' },
+                { english: 'request', korean: '요청, 요청하다' },
+                { english: 'efficiently', korean: '효율적으로' },
+                { english: 'manage', korean: '~을 경영하다, 가까스로 하다' },
+                { english: 'submit', korean: '제출하다' },
+                { english: 'directly', korean: '곧바로' },
+                { english: 'remind', korean: '~에게 상기시키다, 일깨우다' },
+                { english: 'instruct', korean: '지시하다, 가르치다' },
+                { english: 'deadline', korean: '마감일, 마감 시간' },
+                { english: 'sample', korean: '견본, 샘플, 표본, 시식하다, (견본으로 질을) 시험하다' },
+                { english: 'notify', korean: '~에게 통지하다, 알리다' },
+                { english: 'perform', korean: '(일, 과제, 의무 등을) 행하다, 실행하다' },
+                { english: 'monitor', korean: '감독하다, 감시하다, 검토하다' },
+                { english: 'deserve', korean: '~할 만하다, ~할 가치가 있다' },
+                { english: 'assignment', korean: '일, 임무, 과제' },
+                { english: 'entire', korean: '전체의' },
+                { english: 'release', korean: '발표하다, 공개하다, 출시, 발매' },
+                { english: 'extension', korean: '연장, 연기, (전화의) 내선' },
+                { english: 'electronically', korean: '컴퓨터 통신망으로, 컴퓨터로' },
+                { english: 'attendance', korean: '출근, 출석' },
+                { english: 'absolutely', korean: '절대적으로, 완전히' },
+                { english: 'delegate', korean: '(권한 등을) 위임하다, 대표' },
+                { english: 'attentively', korean: '주의 깊게, 조심스럽게' },
+                { english: 'supervision', korean: '감독' },
+                { english: 'workshop', korean: '워크숍, 연수' },
+                { english: 'draw', korean: '끌다, 끌어당기다' },
+                { english: 'revision', korean: '수정, 개정' },
+                { english: 'reluctantly', korean: '마지못해, 꺼려하며' },
+                { english: 'acquaint', korean: '~에게 숙지시키다, 잘 알게 하다' },
+                { english: 'convey', korean: '(용건을) 전달하다' },
+                { english: 'check', korean: '검사하다, 조사하다, 확인하다' },
+                { english: 'headquarters', korean: '본부' },
+                { english: 'file', korean: '(서류를) 정리하다, 철하다, (서류, 신청, 고소 등을) 정식으로 제기하다, 제출하다' },
+                { english: 'oversee', korean: '감독하다' },
+                { english: 'involved', korean: '관여하는, 관계된, 연루된' },
+                { english: 'concentrate', korean: '집중하다, 집중시키다' }
+            ],
+            'Day4': [
+                { english: 'lax', korean: '(행동 등이) 느슨한, 규율에 못 미치는' },
+                { english: 'procrastinate', korean: '미루다, 꾸물거리다' },
+                { english: 'combined', korean: '결합된, 합동의' },
+                { english: 'accomplish', korean: '성취하다' },
+                { english: 'voluntarily', korean: '자발적으로' },
+                { english: 'undertake', korean: '(일을) 떠맡다' },
+                { english: 'assume', korean: '(증거는 없으나) 사실이라고 생각하다, (책임, 역할을) 맡다' },
+                { english: 'occasionally', korean: '가끔, 때때로' },
+                { english: 'employee', korean: '직원, 고용인' },
+                { english: 'assist', korean: '돕다, 조력하다' },
+                { english: 'satisfied', korean: '만족하는, 만족스러워하는' },
+                { english: 'manner', korean: '방식, 태도' },
+                { english: 'responsible', korean: '책임이 있는, 책임져야 할' },
+                { english: 'conduct', korean: '(업무 등을) 수행하다' },
+                { english: 'adjust', korean: '적응하다' },
+                { english: 'personnel', korean: '(집합적) 직원, 인원, 인사과' },
+                { english: 'agree', korean: '동의하다' },
+                { english: 'supervise', korean: '감독하다, 지도하다' },
+                { english: 'coworker', korean: '동료, 협력자' },
+                { english: 'direct', korean: '~에게 길을 안내하다, 가르쳐 주다' },
+                { english: 'confidential', korean: '기밀의, 내밀한' },
+                { english: 'assign', korean: '배정하다, 할당하다' },
+                { english: 'leading', korean: '선도적인, 일류의, 가장 중요한, 선두적인' },
+                { english: 'formal', korean: '격식을 갖춘' },
+                { english: 'remove', korean: '해임하다, 제거하다' },
+                { english: 'collect', korean: '모으다, 수집하다' },
+                { english: 'coordinate', korean: '조정하다' },
+                { english: 'hardly', korean: '거의~하지 않다' },
+                { english: 'abstract', korean: '추상적인, 막연한' },
+                { english: 'directory', korean: '주소록' },
+                { english: 'accountable', korean: '책임이 있는' },
+                { english: 'skillfully', korean: '능숙하게, 솜씨 있게' },
+                { english: 'exclusive', korean: '독점적인, 배타적인' },
+                { english: 'intention', korean: '의지, 의향' },
+                { english: 'transform', korean: '바꾸다, 변모시키다' },
+                { english: 'respectful', korean: '정중한, 존중하는' },
+                { english: 'duplicate', korean: '사본' },
+                { english: 'contrary', korean: '반대' },
+                { english: 'disturbing', korean: '충격적인, 불안감을 주는, 방해하는' },
+                { english: 'engage', korean: '관여하다, 종사하다' },
+                { english: 'foster', korean: '촉진하다, 육성하다' },
+                { english: 'neutrality', korean: '중립성, 중립' },
+                { english: 'widely', korean: '널리' },
+                { english: 'externally', korean: '외부에서, 외부적으로' }
+            ],
+            'Day5': [
+                { english: 'sophisticated', korean: '(기계가) 정교한, 복잡한, 세련된' },
+                { english: 'timely', korean: '시기적절한, 때를 맞춘' },
+                { english: 'realistically', korean: '현실적으로' },
+                { english: 'promptly', korean: '즉시, 정각에' },
+                { english: 'accessible', korean: '출입할 수 있는, 이용할 수 있는' },
+                { english: 'implement', korean: '실시하다, 실행하다' },
+                { english: 'feedback', korean: '의견, 반응' },
+                { english: 'outstanding', korean: '우수한, (부채 등이) 미지불된' },
+                { english: 'inform', korean: '~에게 알리다' },
+                { english: 'replacement', korean: '교체, 후임자' },
+                { english: 'announcement', korean: '공고, 발표' },
+                { english: 'department', korean: '(조직, 기구의) 부서' },
+                { english: 'permanently', korean: '영구적으로, 불변으로' },
+                { english: 'fulfill', korean: '(조건을) 만족시키다, (약속, 의무 등을) 지키다, 이행하다' },
+                { english: 'outline', korean: '개요, 설명하다, 약술하다' },
+                { english: 'explain', korean: '설명하다' },
+                { english: 'contain', korean: '포함하다' },
+                { english: 'compile', korean: '(자료 등을) 편집하다, 모으다' },
+                { english: 'subsequent', korean: '차후의, 그 다음의' },
+                { english: 'overview', korean: '개요, 개관' },
+                { english: 'provider', korean: '공급자, 제공자' },
+                { english: 'matter', korean: '문제, 일' },
+                { english: 'expertise', korean: '전문 지식, 전문 기술' },
+                { english: 'demonstrate', korean: '증명하다, (모험, 실험 등으로) 설명하다' },
+                { english: 'remainder', korean: '나머지' },
+                { english: 'essential', korean: '필수적인, 극히 중요한, 본질적인' },
+                { english: 'divide', korean: '분배하다, 나누다' },
+                { english: 'major', korean: '주요한, 중대한' },
+                { english: 'compliance', korean: '(명령, 법규에의) 준수' },
+                { english: 'clarify', korean: '명확하게 하다' },
+                { english: 'face', korean: '(문제 등에) 직면하다, 향하다, 마주하다' },
+                { english: 'follow', korean: '~을 따라가다, 주시하다, (분명히) 이해하다' },
+                { english: 'aspect', korean: '관점, 국면' },
+                { english: 'apparently', korean: '보기에 ~한 듯한, 외관상으로는' },
+                { english: 'aware', korean: '알고 있는, 인식하고 있는' },
+                { english: 'extended', korean: '(기간 등을) 연장한, 장기간에 걸친' },
+                { english: 'accidentally', korean: '뜻하지 않게, 우연히' },
+                { english: 'advisable', korean: '바람직한, 합당한' },
+                { english: 'concerned', korean: '염려하는, 걱정하는, 관련된' },
+                { english: 'speak', korean: '이야기하다' }
+            ],
+            'Day6': [
+                { english: 'rest', korean: '쉬다, 휴식을 취하다, 휴식, 나머지' },
+                { english: 'exhibition', korean: '전시회' },
+                { english: 'celebrity', korean: '유명 인사, 명사' },
+                { english: 'live', korean: '(라디오, TV가) 생방송인' },
+                { english: 'improvise', korean: '(연주, 연설 등을) 즉흥적으로 하다, 즉석에서 만들다' },
+                { english: 'popular', korean: '인기 있는' },
+                { english: 'donation', korean: '기증, 기부' },
+                { english: 'alumni', korean: '동창생들, 졸업생들' },
+                { english: 'present', korean: '제시하다, 현재의, 참석한' },
+                { english: 'admission', korean: '입장' },
+                { english: 'banquet', korean: '연회, 만찬' },
+                { english: 'anniversary', korean: '기념일' },
+                { english: 'required', korean: '필수의, 의무적인' },
+                { english: 'succeed', korean: '성공하다, 뒤를 잇다' },
+                { english: 'collection', korean: '소장품, 수집물, 징수, 수금' },
+                { english: 'fund-raising', korean: '모금' },
+                { english: 'resume', korean: '재개하다, 다시 시작하다' },
+                { english: 'issue', korean: '(출판물의) 제 ~호, 문제, 쟁점' },
+                { english: 'subscription', korean: '(정기 발행물의) 구독' },
+                { english: 'appear', korean: '나타나다, 출현하다' },
+                { english: 'accompany', korean: '동행하다, 동반하다' },
+                { english: 'edition', korean: '(간행물의) 판' },
+                { english: 'specifically', korean: '명확하게, 분명히, 특히, 특별히' },
+                { english: 'anonymous', korean: '익명의, 이름을 모르는' },
+                { english: 'commit', korean: '헌신하다, 전념하다' },
+                { english: 'informative', korean: '유익한, 정보를 주는' },
+                { english: 'audience', korean: '청중, 관중' },
+                { english: 'author', korean: '작가, 저자' },
+                { english: 'note', korean: '주목하다, 특별히 언급하다' },
+                { english: 'antique', korean: '골동품' },
+                { english: 'manuscript', korean: '원고' },
+                { english: 'beneficial', korean: '유익한, 이로운' },
+                { english: 'upcoming', korean: '곧 있을, 다가오는' },
+                { english: 'lend', korean: '빌려주다' },
+                { english: 'current', korean: '현재의, 현행의, 통용되는' },
+                { english: 'local', korean: '지방의, 고장의' },
+                { english: 'variety', korean: '다양성, 변화, 종류, 품종' },
+                { english: 'advocate', korean: '옹호자' },
+                { english: 'contributor', korean: '기고가, 공헌자' },
+                { english: 'defy', korean: '저항하다, (설명, 묘사 등이) 거의 불가능하다' },
+                { english: 'fascinating', korean: '매혹적인, 황홀한' },
+                { english: 'showing', korean: '(영화, 연극의) 상영, 전시' }
+            ],
+            'Day7': [
+                { english: 'survey', korean: '설문 조사' },
+                { english: 'analysis', korean: '분석' },
+                { english: 'respondent', korean: '응답자' },
+                { english: 'monopoly', korean: '(상품의)독점, 전매' },
+                { english: 'competition', korean: '경쟁' },
+                { english: 'consistently', korean: '항상, 일관되게' },
+                { english: 'demand', korean: '수요, 요구하다' },
+                { english: 'do one\'s utmost', korean: '전력을 다하다' },
+                { english: 'expand', korean: '확장하다, 확대하다' },
+                { english: 'advanced', korean: '고급의, 진보한, 앞선' },
+                { english: 'postpone', korean: '연기하다, 뒤로 미루다' },
+                { english: 'additional', korean: '추가의, 부가적인' },
+                { english: 'appreciate', korean: '고맙게 생각하다, 높이 평가하다, 감상하다' },
+                { english: 'demonstration', korean: '설명, 드러냄, 시연' },
+                { english: 'buy', korean: '구입하다, 사다' },
+                { english: 'examine', korean: '조사하다' },
+                { english: 'effective', korean: '효과적인, (법률 등이)발효되는, 시행되는' },
+                { english: 'like', korean: '좋아하다, ~처럼' },
+                { english: 'especially', korean: '특히' },
+                { english: 'closely', korean: '면밀히, 엄밀히' },
+                { english: 'reserve', korean: '예약하다, 보존하다, 지정하다' },
+                { english: 'cooperate', korean: '협력하다, 협동하다' },
+                { english: 'very', korean: '매우, 대단히, 아주' },
+                { english: 'consecutive', korean: '연속적인' },
+                { english: 'expectation', korean: '예상, 기대' },
+                { english: 'publicize', korean: '공표하다, 광고하다, 선전하다' },
+                { english: 'raise', korean: '높이다, 올리다, (의문을) 제기하다' },
+                { english: 'extremely', korean: '극도로, 대단히' },
+                { english: 'affect', korean: '~에 영향을 미치다, 불리하게 작용하다' },
+                { english: 'target', korean: '목표, 목표로 삼다' },
+                { english: 'campaign', korean: '운동, 캠페인' },
+                { english: 'probable', korean: '개연성이 높은, 유망한' },
+                { english: 'focus', korean: '집중시키다, 집중하다' },
+                { english: 'seasonal', korean: '계절의, 계절적인' },
+                { english: 'impact', korean: '영향, 충격' },
+                { english: 'comparison', korean: '비교' },
+                { english: 'gap', korean: '격차' },
+                { english: 'mounting', korean: '증가하는, 오르는' },
+                { english: 'reflective', korean: '반영하는' }
+            ],
+            'Day8': [
+                { english: 'advertisement', korean: '광고' },
+                { english: 'marginal', korean: '약간의, 주변의' },
+                { english: 'customer', korean: '고객' },
+                { english: 'influence', korean: '~에 영향을 주다, 영향' },
+                { english: 'instantly', korean: '즉각적으로, 즉시' },
+                { english: 'creative', korean: '창조적인, 독창적인' },
+                { english: 'aggressively', korean: '적극적으로' },
+                { english: 'aim', korean: '~을 겨누다, 목표, 목적' },
+                { english: 'strategy', korean: '전략' },
+                { english: 'indicate', korean: '보여주다, 나타내다' },
+                { english: 'attract', korean: '끌다, 유인하다' },
+                { english: 'experience', korean: '경험, 체험, 경험하다, 체험하다' },
+                { english: 'analyze', korean: '분석하다, 분석적으로, 검토하다' },
+                { english: 'introduce', korean: '(신제품을) 발표하다, 소개하다' },
+                { english: 'advise', korean: '조언해 주다, 충고하다' },
+                { english: 'subscribe', korean: '구독하다' },
+                { english: 'absence', korean: '부재, 결근, 결석' },
+                { english: 'means', korean: '방법, 수단' },
+                { english: 'prefer', korean: '(다른 것보다)~을 더 좋아하다, 선호하다' },
+                { english: 'advantage', korean: '이점, 강점' },
+                { english: 'forward', korean: '앞으로, (물건, 정보를) 보내다' },
+                { english: 'contemporary', korean: '동시대의, 현대의, 당대의' },
+                { english: 'discussion', korean: '토론, 토의' },
+                { english: 'initial', korean: '최초의, 처음의' },
+                { english: 'steadily', korean: '착실하게, 꾸준히' },
+                { english: 'necessarily', korean: '반드시' },
+                { english: 'resolve', korean: '(문제 등을) 해결하다' },
+                { english: 'detect', korean: '간파하다, 탐지하다' },
+                { english: 'intensify', korean: '강화하다, 증대하다, 강렬하게 만들다' },
+                { english: 'favorably', korean: '호의적으로, 순조롭게' },
+                { english: 'cover', korean: '포함하다, 지불하다, 덮다' },
+                { english: 'less', korean: '보다 적은, 덜한' },
+                { english: 'majority', korean: '대부분,대다수' },
+                { english: 'adopt', korean: '채택하다' },
+                { english: 'largely', korean: '주로, 대부분' },
+                { english: 'disregard', korean: '소홀히 하다, 무시하다' },
+                { english: 'effort', korean: '노력' },
+                { english: 'incentive', korean: '혜택, 장려금' },
+                { english: 'need', korean: '필요, 요구, 욕구, ~할 필요가 있다' },
+                { english: 'mastermind', korean: '(계획 등의) 입안자, 지도자' }
+            ],
+            'Day9': [
+                { english: 'stagnant', korean: '침체된, 불경기의' },
+                { english: 'dramatically', korean: '극적으로' },
+                { english: 'brisk', korean: '활발한, 호황의' },
+                { english: 'unstable', korean: '불안정한, 변하기 쉬운' },
+                { english: 'rapidly', korean: '급속히, 빨리' },
+                { english: 'soar', korean: '(물가 등이) 폭등하다, 높이 치솟다' },
+                { english: 'assert', korean: '단언하다, 주장하다' },
+                { english: 'boost', korean: '(경기를) 부양시키다, 상승시키다' },
+                { english: 'analyst', korean: '분석가' },
+                { english: 'potential', korean: '잠재적인, 가능성' },
+                { english: 'pleased', korean: '만족해 하는, 기쁜' },
+                { english: 'remain', korean: '계속 ~한 상태이다, 아직 ~해야 하다' },
+                { english: 'limited', korean: '제한된, 한정된' },
+                { english: 'costly', korean: '비용이 많이 드는, 손실이 큰' },
+                { english: 'particular', korean: '특정한' },
+                { english: 'drastic', korean: '과감한, 급격한' },
+                { english: 'evenly', korean: '고르게, 균등하게' },
+                { english: 'evidence', korean: '증거' },
+                { english: 'prospect', korean: '전망, 예상' },
+                { english: 'lead', korean: '이끌다, 지휘하다, (어떤 결과에) 이르다' },
+                { english: 'fall', korean: '(값, 가치가) 하락하다' },
+                { english: 'period', korean: '기간, 시기' },
+                { english: 'indicator', korean: '지표, 지수' },
+                { english: 'industry', korean: '산업' },
+                { english: 'likely', korean: '~할 것 같은' },
+                { english: 'boom', korean: '붐, 호황' },
+                { english: 'director', korean: '임원, 책임자' },
+                { english: 'substitute', korean: '대용품, 대신하다' },
+                { english: 'consequence', korean: '결과' },
+                { english: 'fairly', korean: '상당히, 꽤' },
+                { english: 'economical', korean: '경제적인, 절약되는' },
+                { english: 'thrive', korean: '번영하다, 성공하다' },
+                { english: 'implication', korean: '영향, 밀접한 관계' },
+                { english: 'wane', korean: '감소, 쇠퇴' },
+                { english: 'prosperity', korean: '번영' },
+                { english: 'depression', korean: '불황' },
+                { english: 'dwindle', korean: '줄어들다, 감소되다' },
+                { english: 'impede', korean: '저해하다, 방해하다' },
+                { english: 'promising', korean: '유망한, 전망이 좋은' },
+                { english: 'adversity', korean: '역경, 불운' }
+            ],
+            'Day10': [
+                { english: 'purchase', korean: '구매하다, 구매' },
+                { english: 'price', korean: '가격' },
+                { english: 'affordable', korean: '가격이 알맞은, 감당할 수 있는' },
+                { english: 'exactly', korean: '정확히' },
+                { english: 'installment', korean: '할부' },
+                { english: 'notice', korean: '통지, 공고' },
+                { english: 'charge', korean: '요금, 청구 금액, 책임, 의무, ~을 청구하다, (외상으로)달아놓다' },
+                { english: 'experienced', korean: '경험이 있는, 노련한, 능숙한' },
+                { english: 'instruction', korean: '설명, 지시' },
+                { english: 'expert', korean: '전문가, 전문가의, 전문적인' },
+                { english: 'warranty', korean: '(품질 등의)보증, 보증서' },
+                { english: 'refund', korean: '환불, 환불금' },
+                { english: 'subscriber', korean: '가입자, 구독자' },
+                { english: 'delivery', korean: '배달' },
+                { english: 'receipt', korean: '영수증' },
+                { english: 'carefully', korean: '주의 깊게, 신중히' },
+                { english: 'offer', korean: '제공하다, 제공, 오퍼' },
+                { english: 'benefit', korean: '혜택, 이익, 혜택을 보다, 이익을 얻다' },
+                { english: 'exclusively', korean: '오로지, 독점적으로' },
+                { english: 'description', korean: '(제품 등의)설명, 해설' },
+                { english: 'relatively', korean: '상대적으로' },
+                { english: 'preparation', korean: '준비, 대비' },
+                { english: 'spare', korean: '아끼다, 할애하다, 예비의, 여분의' },
+                { english: 'area', korean: '지역, 구역' },
+                { english: 'clearance', korean: '정리, 없애기, 허가' },
+                { english: 'alter', korean: '(성질, 형상을)고치다, 바꾸다' },
+                { english: 'apply', korean: '적용하다, 지원하다' },
+                { english: 'mutually', korean: '서로, 상호 간에' },
+                { english: 'method', korean: '방식, 방법' },
+                { english: 'acceptable', korean: '용인되는, 받아들일 수 있는, 훌륭한, 만족스러운' },
+                { english: 'desire', korean: '욕구, 갈망, 원하다, 바라다' },
+                { english: 'redeemable', korean: '(현금, 상품과)교환할 수 있는, 환급할 수 있는' },
+                { english: 'officially', korean: '공식적으로' },
+                { english: 'consumption', korean: '소비(량), 소모' },
+                { english: 'qualify', korean: '~의 자격을 얻다' },
+                { english: 'fabric', korean: '섬유, 천' },
+                { english: 'auction', korean: '경매' },
+                { english: 'authentic', korean: '진정한, 진짜의, 진품의' },
+                { english: 'valid', korean: '유효한' },
+                { english: 'vendor', korean: '노점상, 가판대, 판매업체' }
+            ],
+            'Day11': [
+                { english: 'research', korean: '연구, 조사' },
+                { english: 'devise', korean: '고안하다, 발명하다' },
+                { english: 'revolutionary', korean: '혁명적인' },
+                { english: 'innovative', korean: '혁신적인' },
+                { english: 'feature', korean: '특징, 특색, 특징으로 삼다, 특별히 포함하다' },
+                { english: 'inspiration', korean: '영감' },
+                { english: 'sufficiently', korean: '충분히' },
+                { english: 'patent', korean: '특허, 특허권, 특허품' },
+                { english: 'envision', korean: '(장래의 일 등을)계획하다, 상상하다' },
+                { english: 'extend', korean: '연장하다, (기간을)늘리다, (감사의 뜻을) 말하다, 베풀다' },
+                { english: 'following', korean: '~후에, 다음의, 다음에 오는' },
+                { english: 'intend', korean: '~할 작정이다, 의도하다' },
+                { english: 'grant', korean: '(인정하여 정식으로)수여하다, 주다, (연구비, 장학금 등의) 보조금' },
+                { english: 'allow', korean: '~하게 하다, ~을 허락하다' },
+                { english: 'inspect', korean: '~을 검사하다, 조사하다' },
+                { english: 'improve', korean: '향상시키다, 개선하다' },
+                { english: 'increasingly', korean: '점점, 더욱더' },
+                { english: 'invest', korean: '투자하다, 운용하다' },
+                { english: 'various', korean: '여러 가지의, 가지각색의' },
+                { english: 'upgrade', korean: '업그레이드, 개량형, 업그레이드하다, 개선하다' },
+                { english: 'manual', korean: '설명서, 안내서' },
+                { english: 'explore', korean: '조사하다, 탐구하다' },
+                { english: 'response', korean: '응답, 대답' },
+                { english: 'appearance', korean: '외관, 외모' },
+                { english: 'successful', korean: '성공적인, 성공한' },
+                { english: 'accommodate', korean: '~을 수용하다, ~을 담다, (회의 등을)개최하다, 열다' },
+                { english: 'advance', korean: '진보, 전진' },
+                { english: 'reliable', korean: '믿을 만한, 신뢰할 수 있는' },
+                { english: 'quality', korean: '품질, 질' },
+                { english: 'domestic', korean: '국내의, 국산의' },
+                { english: 'development', korean: '개발, 발전' },
+                { english: 'availability', korean: '(입수)가능성, 유효성, 유용성' },
+                { english: 'update', korean: '갱신, 개정, 갱신하다, 최신의 것으로 하다' },
+                { english: 'accurate', korean: '정확한' },
+                { english: 'complicated', korean: '복잡한' },
+                { english: 'accomplished', korean: '숙련된, 노련한' },
+                { english: 'inquiry', korean: '문의, 질문' },
+                { english: 'indication', korean: '징후, 조짐' },
+                { english: 'manufacturer', korean: '제조 회사, 제조업자' },
+                { english: 'compatible', korean: '호환되는, 양립할 수 있는' },
+                { english: 'superior', korean: '우수한, 상급의' },
+                { english: 'absolute', korean: '완전한, 완전무결한' },
+                { english: 'broaden', korean: '넓히다' },
+                { english: 'corrosion', korean: '부식' },
+                { english: 'remotely', korean: '원격으로, 멀리서' }
+            ],
+            'Day12': [
+                { english: 'equipment', korean: '장비, 설비' },
+                { english: 'automate', korean: '자동화하다' },
+                { english: 'specification', korean: '명세서, 설명서, 사양' },
+                { english: 'properly', korean: '제대로, 정확하게' },
+                { english: 'safety', korean: '안전' },
+                { english: 'precaution', korean: '예방 조치, 예방책' },
+                { english: 'operate', korean: '(기계 등이) 작동하다, 움직이다' },
+                { english: 'processing', korean: '가공, 처리' },
+                { english: 'capacity', korean: '용량, 수용력, 역할' },
+                { english: 'assemble', korean: '(부품, 기계 등을)조립하다, (사람을) 모으다' },
+                { english: 'utilize', korean: '이용하다, 활용하다' },
+                { english: 'place', korean: '~을 ~한 상태에 두다, (지시, 주문, 신청 등을)하다' },
+                { english: 'fill', korean: '~을 채우다, (주문대로)이행하다' },
+                { english: 'manufacturing', korean: '제조(업)의' },
+                { english: 'renovate', korean: '(낡은 건물, 가구 등을)개조하다, 수리하다, 보수하다' },
+                { english: 'decision', korean: '결정, 판단' },
+                { english: 'material', korean: '재료, 물질' },
+                { english: 'success', korean: '성공, 성과' },
+                { english: 'attribute', korean: '(원인을) ~의 덕분으로 돌리다' },
+                { english: 'efficiency', korean: '효율, 능률' },
+                { english: 'limit', korean: '한계, 제한' },
+                { english: 'tailored', korean: '맞춤의, 주문에 따라 맞춘' },
+                { english: 'component', korean: '부품, (구성)요소' },
+                { english: 'capable', korean: '~을 할 수 있는, ~할 능력이 있는' },
+                { english: 'economize', korean: '절약하다, 아끼다' },
+                { english: 'flexible', korean: '융통성 있는, 유연한, 잘 구부러지는' },
+                { english: 'comparable', korean: '필적하는, 비교되는' },
+                { english: 'produce', korean: '생산하다' },
+                { english: 'respectively', korean: '각각, 따로' },
+                { english: 'device', korean: '장치' },
+                { english: 'trim', korean: '(깎아)다듬다, 없애다, 삭감하다' },
+                { english: 'launch', korean: '(신제품을)출시하다' },
+                { english: 'separately', korean: '개별적으로, 따로따로' },
+                { english: 'expiration', korean: '(기간, 임기 등의) 만료, 만기' },
+                { english: 'maneuver', korean: '이동시키다, 움직이다' },
+                { english: 'coming', korean: '다가오는' },
+                { english: 'damaged', korean: '손상된, 손해를 입은' },
+                { english: 'prevent', korean: '~을 막다, ~을 예방하다' },
+                { english: 'power', korean: '전력, 전기' },
+                { english: 'chemical', korean: '화학 제품' },
+                { english: 'minimize', korean: '최소화하다, 축소하다' }
+            ],
+            'Day13': [
+                { english: 'complaint', korean: '불평' },
+                { english: 'deal', korean: '처리하다, 거래하다, 분배하다, 거래' },
+                { english: 'argumentative', korean: '논쟁적인, 논쟁을 좋아하는' },
+                { english: 'appropriately', korean: '적절하게' },
+                { english: 'respond', korean: '응답하다' },
+                { english: 'infuriate', korean: '화나게 하다, 격분시키다' },
+                { english: 'courteous', korean: '예의 바른' },
+                { english: 'satisfaction', korean: '만족' },
+                { english: 'inconvenience', korean: '불편, ~에게 불편을 느끼게 하다' },
+                { english: 'complete', korean: '완료하다, 완성하다, 완료된, 완성된' },
+                { english: 'specific', korean: '구체적인, 명확한' },
+                { english: 'return', korean: '반환하다, 반송하다, 돌아오다, 돌아가다' },
+                { english: 'replace', korean: '~을 교체하다, 대체하다' },
+                { english: 'presentation', korean: '발표' },
+                { english: 'evaluation', korean: '평가' },
+                { english: 'confident', korean: '확신하는, 자신 있는' },
+                { english: 'cause', korean: '~을 이야기하다, ~의 원인이 되다, 원인' },
+                { english: 'commentary', korean: '해설, 설명' },
+                { english: 'notification', korean: '통지' },
+                { english: 'apologize', korean: '사과하다' },
+                { english: 'interact', korean: '소통하다, 교류하다, 상호 작용을 하다' },
+                { english: 'certain', korean: '확신하는, 확실한, 특정한' },
+                { english: 'commitment', korean: '헌신, 전념' },
+                { english: 'applaud', korean: '~에게 박수를 보내다, 칭찬하다' },
+                { english: 'biography', korean: '약력, 전기' },
+                { english: 'critical', korean: '비판적인, 중요한, 위기의' },
+                { english: 'depend on', korean: '~에 달려 있다, ~에게 의존하다' },
+                { english: 'combine', korean: '결합시키다' },
+                { english: 'priority', korean: '우선권, 우선 사항' },
+                { english: 'observe', korean: '관찰하다, 주시하다, (규칙 등을) 준수하다, 지키다' },
+                { english: 'defective', korean: '결함이 있는' },
+                { english: 'reflect', korean: '반영하다, 나타내다' },
+                { english: 'attitude', korean: '태도, 마음가짐' },
+                { english: 'disappoint', korean: '실망시키다' },
+                { english: 'inquire', korean: '문의하다, 질문하다' },
+                { english: 'insert', korean: '삽입하다' },
+                { english: 'disclose', korean: '공개하다, 드러내다' },
+                { english: 'guarantee', korean: '보장하다, 보장' },
+                { english: 'politely', korean: '공손하게, 예의 바르게' },
+                { english: 'seriously', korean: '진지하게' }
+            ],
+            'Day14': [
+                { english: 'international', korean: '국제적인' },
+                { english: 'attraction', korean: '관광명소' },
+                { english: 'itinerary', korean: '여행 일정' },
+                { english: 'exotic', korean: '이국적인, 매혹적인' },
+                { english: 'diverse', korean: '다양한' },
+                { english: 'superb', korean: '최고의, 뛰어난' },
+                { english: 'baggage', korean: '수화물' },
+                { english: 'destination', korean: '목적지' },
+                { english: 'missing', korean: '분실된, 없어진' },
+                { english: 'locate', korean: '(~의 위치를)찾아내다, ~을 위치시키다' },
+                { english: 'approximately', korean: '대략' },
+                { english: 'duty', korean: '관세, 세금, 직무, 의무' },
+                { english: 'process', korean: '과정, 처리하다' },
+                { english: 'board', korean: '탑승하다, 이사회' },
+                { english: 'comfortable', korean: '편안한' },
+                { english: 'declare', korean: '(세관에서)신고하다' },
+                { english: 'specify', korean: '명시하다' },
+                { english: 'depart', korean: '출발하다' },
+                { english: 'emergency', korean: '비상시, 비상사태' },
+                { english: 'passenger', korean: '승객' },
+                { english: 'outgoing', korean: '(장소를)출발하는, 떠나는, (지위를) 떠나는' },
+                { english: 'tightly', korean: '단단히, 꽉' },
+                { english: 'tour', korean: '(공장, 시설 등의) 견학, 짧은 여행' },
+                { english: 'carrier', korean: '항공사, 수송기, 수송 회사' },
+                { english: 'customarily', korean: '관례상, 습관적으로' },
+                { english: 'confuse', korean: '혼란시키다' },
+                { english: 'arrive', korean: '도착하다' },
+                { english: 'brochure', korean: '(홍보용)소책자, 브로셔' },
+                { english: 'involve', korean: '수반하다, 포함하다, 참여시키다' },
+                { english: 'ship', korean: '(배나 다른 운송수단으로) 운송하다, 수송하다, 선박, 배' },
+                { english: 'suitcase', korean: '여행 가방' },
+                { english: 'unavailable', korean: '이용할 수 없는, 구할 수 없는' },
+                { english: 'fill out/in', korean: '(서류에)기입하다, 적어 넣다' },
+                { english: 'customs', korean: '세관' },
+                { english: 'away', korean: '떨어져서' },
+                { english: 'dramatic', korean: '멋진, 극적인, 급격한' },
+                { english: 'hospitality', korean: '환대, 친절' },
+                { english: 'indulge', korean: '빠지다, 탐닉하다' },
+                { english: 'proximity', korean: '가까움, 근접함' },
+                { english: 'seating', korean: '(집합적)좌석 설비, 좌석 배열' },
+                { english: 'unlimited', korean: '무제한의' },
+                { english: 'simply', korean: '그저, 단지, 간단히' },
+                { english: 'besides', korean: '게다가, 뿐만 아니라, ~외에' },
+                { english: 'traditionally', korean: '전통적으로' }
+            ],
+            'Day15': [
+                { english: 'proposal', korean: '제안, 계획' },
+                { english: 'alliance', korean: '동맹, 제휴' },
+                { english: 'stipulation', korean: '계약 조건' },
+                { english: 'term', korean: '조건, 임기, 기한' },
+                { english: 'compromise', korean: '타협, 화해' },
+                { english: 'negotiation', korean: '협상, 교섭' },
+                { english: 'agreement', korean: '계약, 협정, 합의' },
+                { english: 'deadlock', korean: '교착 상태' },
+                { english: 'review', korean: '검토하다, 재조사하다' },
+                { english: 'contract', korean: '계약(서), 계약하다, 수축하다' },
+                { english: 'signature', korean: '서명' },
+                { english: 'originally', korean: '원래, 처음에는' },
+                { english: 'direction', korean: '방향, 지시, 감독' },
+                { english: 'initially', korean: '처음에, 초기에' },
+                { english: 'expire', korean: '(계약 등이) 만료되다' },
+                { english: 'collaborate', korean: '협력하다, 공동으로 일하다' },
+                { english: 'dedicate', korean: '전념하다, 헌신하다, 바치다' },
+                { english: 'revised', korean: '수정된, 변경한' },
+                { english: 'imperative', korean: '반드시 해야 하는, 필수적인' },
+                { english: 'cooperatively', korean: '협력하여, 협조적으로' },
+                { english: 'commission', korean: '수수료, 커미션, 위원회, (일 등을) 의뢰하다, 주문하다' },
+                { english: 'omit', korean: '빠트리다, 생략하다' },
+                { english: 'conflict', korean: '대립, 충돌, 갈등' },
+                { english: 'renew', korean: '(계약 등을) 갱신하다' },
+                { english: 'proficient', korean: '능숙한, 능한' },
+                { english: 'confidentiality', korean: '기밀, 비밀' },
+                { english: 'dispute', korean: '분쟁, 논쟁' },
+                { english: 'objection', korean: '반대, 이의' },
+                { english: 'define', korean: '규정하다, 정의하다' },
+                { english: 'impression', korean: '인상' },
+                { english: 'security', korean: '보안, 안전, 보호' },
+                { english: 'option', korean: '선택권' },
+                { english: 'proceed', korean: '(일을) 진행하다, 진척되다' },
+                { english: 'modify', korean: '수정하다, 일부 변경하다' },
+                { english: 'narrow', korean: '(범위 등을) 좁히다' },
+                { english: 'bid', korean: '입찰' },
+                { english: 'settle', korean: '해결하다, 처리하다' },
+                { english: 'terminate', korean: '끝내다, 종결시키다' },
+                { english: 'challenging', korean: '도전적인, 힘든' },
+                { english: 'foundation', korean: '토대, 기초' },
+                { english: 'pending', korean: '미결인, 미정인, 임박한' }
+            ],
+            'Day16': [
+                { english: 'completely', korean: '전적으로, 완전히' },
+                { english: 'refuse', korean: '거절하다' },
+                { english: 'temporarily', korean: '일시적으로' },
+                { english: 'dealer', korean: '판매업자, 상인' },
+                { english: 'bulk', korean: '대량의' },
+                { english: 'inventory', korean: '재고품, 재고 목록' },
+                { english: 'short', korean: '부족한' },
+                { english: 'cost', korean: '비용, (비용)이 들다' },
+                { english: 'selection', korean: '선택된 것, 정선품' },
+                { english: 'commercial', korean: '상업의, 상업적인, 광고' },
+                { english: 'order', korean: '주문하다, 주문, 주문품' },
+                { english: 'provide', korean: '공급하다, 제공하다' },
+                { english: 'contact', korean: '~와 연락하다, (상업적 목적으로) 교섭하고 있는 사람' },
+                { english: 'invoice', korean: '송장' },
+                { english: 'move', korean: '옮기다, 움직이다, 조치, 수단, 이동, 이사' },
+                { english: 'supply', korean: '공급하다, 공급, 비품, 소모품' },
+                { english: 'discount', korean: '할인' },
+                { english: 'distribute', korean: '배포하다, 배급하다' },
+                { english: 'acquisition', korean: '인수, 구입한 것' },
+                { english: 'assure', korean: '~에게 보장하다, ~을 안심시키다, 장담하다' },
+                { english: 'subject', korean: '~의 영향을 받기 쉬운, (동의 등을) 조건으로 하는, ~에게 (~을) 받게 하다' },
+                { english: 'seek', korean: '구하다, 찾다' },
+                { english: 'satisfactory', korean: '만족스러운' },
+                { english: 'confirmation', korean: '확인, 확증' },
+                { english: 'unable', korean: '~할 수 없는' },
+                { english: 'payment', korean: '지불(금액), 납입(금액)' },
+                { english: 'measure', korean: '대책, 조치, 수단, 측정하다' },
+                { english: 'bargain', korean: '특가품, 흥정' },
+                { english: 'stock', korean: '재고, 주식' },
+                { english: 'affordability', korean: '감당할 수 있는 비용' },
+                { english: 'clientele', korean: '(집합적) 고객들, (변호사, 건축가 등의) 모든 의뢰인' },
+                { english: 'acclaim', korean: '호평, 찬사' },
+                { english: 'represent', korean: '~을 대표하다' },
+                { english: 'rating', korean: '등급, 평가' },
+                { english: 'encompass', korean: '포함하다, 둘러싸다' },
+                { english: 'finalize', korean: '마무리 짓다, 완결하다' },
+                { english: 'market', korean: '시장' },
+                { english: 'retail', korean: '소매' },
+                { english: 'commodity', korean: '상품, 산물' },
+                { english: 'quote', korean: '견적(액), 견적을 내다' },
+                { english: 'consignment', korean: '위탁 판매' }
+            ],
+            'Day17': [
+                { english: 'fragile', korean: '깨지기 쉬운' },
+                { english: 'perishable', korean: '부패하기 쉬운' },
+                { english: 'deliver', korean: '배달하다, (연설을)하다' },
+                { english: 'ensure', korean: '확실하게 하다, 보장하다' },
+                { english: 'courier', korean: '급송 택배' },
+                { english: 'carton', korean: '(큰) 판지 상자' },
+                { english: 'address', korean: '주소, (어려운 문제 등을) 처리하다, 다루다' },
+                { english: 'shipment', korean: '선적, (화물의) 발송, 수송품, 적하물' },
+                { english: 'particularly', korean: '특히' },
+                { english: 'adequately', korean: '적절히' },
+                { english: 'article', korean: '물품, 물건, 기사, 논설' },
+                { english: 'efficient', korean: '(기계, 방법 등이) 효과적인, 능률적인' },
+                { english: 'agency', korean: '대행 회사, 대리점' },
+                { english: 'enclose', korean: '~을 동봉하다, ~을 둘러싸다, 에워싸다' },
+                { english: 'careful', korean: '조심스러운, 주의 깊은' },
+                { english: 'pick up', korean: '~을 찾다, (사람, 물건 등을) 도중에서 태우다' },
+                { english: 'carry', korean: '지니다, (물품을) 팔다, 가게에 놓다' },
+                { english: 'attach', korean: '붙이다, 접착하다, 첨부하다' },
+                { english: 'formerly', korean: '이전에' },
+                { english: 'package', korean: '소포, 꾸러미' },
+                { english: 'react', korean: '반응하다, 대응하다' },
+                { english: 'content', korean: '내용물' },
+                { english: 'convenience', korean: '편의, 편리' },
+                { english: 'acknowledge', korean: '인정하다, (편지 등의) 수령을 알리다' },
+                { english: 'caution', korean: '주의, 조심' },
+                { english: 'correspondence', korean: '편지, 통신문' },
+                { english: 'separate', korean: '분리하다, 분류하다, 분리된, 따로 떨어진, 독립된' },
+                { english: 'remarkable', korean: '현저한, 두드러진' },
+                { english: 'handle', korean: '취급하다, 다루다' },
+                { english: 'warehouse', korean: '창고, 저장소' },
+                { english: 'impose', korean: '(세금 등을) 부과하다' },
+                { english: 'storage', korean: '보관소, 저장소' },
+                { english: 'detach', korean: '분리하다, 떼다' },
+                { english: 'envelope', korean: '봉투' },
+                { english: 'exclusion', korean: '제외, 배제' },
+                { english: 'recipient', korean: '수신자' },
+                { english: 'affix', korean: '(우표 등을) 붙이다' },
+                { english: 'incorrect', korean: '부정확한' },
+                { english: 'oblige', korean: '어쩔 수 없이 ~하게 하다, ~에게 강요하다' },
+                { english: 'step', korean: '단계, 조치, 수단' },
+                { english: 'distinctive', korean: '독특한' },
+                { english: 'discreet', korean: '신중한, 조심스러운, 분별력 있는' }
+            ],
+            'Day18': [
+                { english: 'check in', korean: '체크인하다, 숙박 수속을 하다' },
+                { english: 'compensate', korean: '보상하다' },
+                { english: 'complimentary', korean: '무료의, 우대의' },
+                { english: 'chef', korean: '주방장' },
+                { english: 'container', korean: '용기, 그릇' },
+                { english: 'elegant', korean: '우아한, 고상한' },
+                { english: 'flavor', korean: '맛, 풍미' },
+                { english: 'accommodate', korean: '(건물 등이) ~을 수용하다, 숙박시키다, (조건, 요구 등을) 만족시키다' },
+                { english: 'available', korean: '(사물이) 이용 가능한, (사람이) 시간이 있는' },
+                { english: 'reception', korean: '환영회, (호텔, 회사, 병원 등의) 접수처' },
+                { english: 'in advance', korean: '미리, 사전에' },
+                { english: 'refreshment', korean: '다과, 가벼운 음식물' },
+                { english: 'make', korean: '~을 하다, ~을 만들다' },
+                { english: 'cater', korean: '(연회등의) 음식물을 공급하다' },
+                { english: 'reservation', korean: '예약, 지정, 보호 구역' },
+                { english: 'beverage', korean: '음료' },
+                { english: 'confirm', korean: '확인하다' },
+                { english: 'cancel', korean: '취소하다' },
+                { english: 'rate', korean: '요금' },
+                { english: 'conveniently', korean: '편리하게' },
+                { english: 'decorate', korean: '장식하다' },
+                { english: 'information', korean: '정보, 자료' },
+                { english: 'retain', korean: '유지하다, 보유하다' },
+                { english: 'atmosphere', korean: '분위기, 환경' },
+                { english: 'cuisine', korean: '(독특한) 요리' },
+                { english: 'sequence', korean: '순서, 차례' },
+                { english: 'extensive', korean: '광범위한, 넓은' },
+                { english: 'prior', korean: '전의, 먼저의' },
+                { english: 'book', korean: '예약하다' },
+                { english: 'amenity', korean: '편의 시설' },
+                { english: 'belongings', korean: '소지품, 소유물' },
+                { english: 'entirely', korean: '완전히' },
+                { english: 'ease', korean: '완화시키다, 쉬움, 용이함' },
+                { english: 'ingredient', korean: '재료, 성분' },
+                { english: 'sip', korean: '음미하며 마시다, 홀짝거리다' },
+                { english: 'stir', korean: '휘젓다, 뒤섞다' },
+                { english: 'choice', korean: '선택물, 선택 사항, 선택' },
+                { english: 'complication', korean: '복잡한 문제' },
+                { english: 'freshness', korean: '신선함' },
+                { english: 'occupancy', korean: '(호텔 등의) 이용률' },
+                { english: 'spot', korean: '발견하다, 찾다, 알아채다, (특정한) 장소' }
+            ],
+            'Day19': [
+                { english: 'decline', korean: '감소, 하락, (초대, 신청을) 거절하다, 감소하다, 줄다' },
+                { english: 'markedly', korean: '현저하게, 눈에 띄게' },
+                { english: 'increase', korean: '인상, 증가, 증가하다' },
+                { english: 'revenue', korean: '수입' },
+                { english: 'projection', korean: '예상(치)' },
+                { english: 'substantial', korean: '상당한' },
+                { english: 'anticipate', korean: '예상하다, 기대하다' },
+                { english: 'significantly', korean: '상당히, 두드러지게' },
+                { english: 'estimate', korean: '추정하다, 추산하다, 추정(치), 추산' },
+                { english: 'shift', korean: '옮기다, 이동하다, 변화, 교대 근무' },
+                { english: 'fee', korean: '요금, 수수료' },
+                { english: 'production', korean: '생산량, 생산' },
+                { english: 'sale', korean: '매출액, 매상고, (할인) 판매' },
+                { english: 'impressive', korean: '굉장한, 인상적인' },
+                { english: 'representative', korean: '직원, 외판원, 대표자' },
+                { english: 'recent', korean: '최근의' },
+                { english: 'exceed', korean: '~을 초과하다' },
+                { english: 'improvement', korean: '향상' },
+                { english: 'employer', korean: '고용주' },
+                { english: 'regular', korean: '장기적인, 단골의' },
+                { english: 'summarize', korean: '요약하다' },
+                { english: 'typically', korean: '보통, 일반적으로' },
+                { english: 'whole', korean: '전체의, 온전한' },
+                { english: 'growth', korean: '성장, 발전' },
+                { english: 'figure', korean: '총액, 합계 수' },
+                { english: 'steady', korean: '꾸준한, 안정된' },
+                { english: 'frequent', korean: '빈번한, 잦은' },
+                { english: 'achieve', korean: '달성하다, 취득하다' },
+                { english: 'assumption', korean: '추정, 산정' },
+                { english: 'share', korean: '공유하다, 함께 쓰다, (생각, 경험, 감정을 남과) 함께 나누다, 몫, 지분' },
+                { english: 'encouraging', korean: '고무적인, 힘을 북돋아 주는' },
+                { english: 'incur', korean: '(손실을) 입다, (빚을) 지다' },
+                { english: 'slightly', korean: '약간' },
+                { english: 'profit', korean: '수익, 이익' },
+                { english: 'reliant', korean: '의존하는, 의지하는' },
+                { english: 'illustrate', korean: '분명히 보여 주다, 설명하다' },
+                { english: 'inaccurate', korean: '부정확한' },
+                { english: 'percentage', korean: '비율, 백분율' },
+                { english: 'reduce', korean: '줄이다, 감소시키다' },
+                { english: 'tend', korean: '~하는 경향이 있다, ~하기 쉽다' },
+                { english: 'beyond', korean: '~을 넘어서, ~을 이상으로' }
+            ],
+            'Day20': [
+                { english: 'audit', korean: '회계 감사, 심사' },
+                { english: 'accounting', korean: '회계' },
+                { english: 'budget', korean: '예산' },
+                { english: 'financial', korean: '재정의, 금전상의' },
+                { english: 'curtail', korean: '~을 줄이다, 삭감하다' },
+                { english: 'deficit', korean: '적자, 부족액' },
+                { english: 'recently', korean: '최근에' },
+                { english: 'substantially', korean: '크게, 상당히' },
+                { english: 'committee', korean: '위원회' },
+                { english: 'frequently', korean: '자주, 흔히' },
+                { english: 'capability', korean: '능력, 역량' },
+                { english: 'proceeds', korean: '수익금' },
+                { english: 'reimburse', korean: '변제하다, 상환하다' },
+                { english: 'considerably', korean: '상당히, 많이' },
+                { english: 'adequate', korean: '충분한, 적절한' },
+                { english: 'total', korean: '총계의, 전부의' },
+                { english: 'allocate', korean: '할당하다, 배분하다' },
+                { english: 'inspector', korean: '조사관, 감독관' },
+                { english: 'preferred', korean: '선호되는, 우선의' },
+                { english: 'quarter', korean: '사분기, 4분의1' },
+                { english: 'interrupt', korean: '중단시키다, 방해하다' },
+                { english: 'browse', korean: '훑어보다, 둘러보다' },
+                { english: 'prompt', korean: '즉각적인, 신속한, 촉발하다, 유도하다' },
+                { english: 'deduct', korean: '공제하다, 빼다' },
+                { english: 'measurement', korean: '측정, 측량, 지수' },
+                { english: 'shorten', korean: '단축하다, 짧게 하다' },
+                { english: 'amend', korean: '수정하다' },
+                { english: 'calculate', korean: '계산하다, 산출하다' },
+                { english: 'exempt', korean: '면제된, ~이 없는' },
+                { english: 'deficient', korean: '부족한, 불충분한' },
+                { english: 'compare', korean: '비교하다' },
+                { english: 'fortunate', korean: '운 좋은' },
+                { english: 'expenditure', korean: '지출, 비용' },
+                { english: 'accurately', korean: '정확하게' },
+                { english: 'worth', korean: '~의 가치가 있는, (얼마)어치, 가치' },
+                { english: 'excess', korean: '초과, 초과량' },
+                { english: 'fiscal', korean: '회계의, 재정상의' },
+                { english: 'incidental', korean: '부수적인' },
+                { english: 'inflation', korean: '물가 상승, 인플레이션, 통화 팽창' },
+                { english: 'liable', korean: '책임져야 할, ~하기 쉽운' },
+                { english: 'spend', korean: '~을 쓰다, 소비하다' },
+                { english: 'turnover', korean: '총 매상고, 거래액, 이직률' }
+            ],
+            'Day21': [
+                { english: 'announce', korean: '발표하다' },
+                { english: 'interested', korean: '관련 있는, 관심이 있는' },
+                { english: 'active', korean: '적극적인, 활발한' },
+                { english: 'accept', korean: '수락하다, 승낙하다' },
+                { english: 'foresee', korean: '예견하다, 예감하다' },
+                { english: 'expansion', korean: '확장, 팽창' },
+                { english: 'relocate', korean: '(공장 등을) 이전하다' },
+                { english: 'competitor', korean: '경쟁업체, 경쟁자' },
+                { english: 'asset', korean: '자산' },
+                { english: 'contribute', korean: '기여하다, 공헌하다' },
+                { english: 'dedicated', korean: '(목표 등에) 전념하는, 헌신적인' },
+                { english: 'misplace', korean: '잃어버리다, 위치를 잘못 잡다' },
+                { english: 'considerable', korean: '(정도나 양이) 상당한' },
+                { english: 'last', korean: '지속되다' },
+                { english: 'emerge', korean: '부상하다, 나타나다' },
+                { english: 'grow', korean: '성장하다, 성장시키다, 증가시키다' },
+                { english: 'select', korean: '선발하다, 선택하다' },
+                { english: 'merge', korean: '합병하다, 병합하다' },
+                { english: 'imply', korean: '암시하다, 넌지시 나타내다, 의미하다' },
+                { english: 'vital', korean: '필수적인' },
+                { english: 'persist', korean: '(집요하게) 계속하다, 계속되다, 지속되다' },
+                { english: 'independent', korean: '독립적인, 독자적인' },
+                { english: 'force', korean: '세력' },
+                { english: 'establish', korean: '설립하다' },
+                { english: 'initiate', korean: '(사업 등을) 착수하다, 시작하다' },
+                { english: 'enhance', korean: '(질 등을) 향상시키다, 높이다, 강화하다' },
+                { english: 'renowned', korean: '저명한, 유명한, 명성이 있는' },
+                { english: 'informed', korean: '정보에 근거한' },
+                { english: 'minutes', korean: '회의록' },
+                { english: 'waive', korean: '(규칙 등을) 적용하지 않다, (권리, 청구 등을) 포기하다' },
+                { english: 'reach', korean: '(치수, 양 등이) ~에 달하다, ~에 도착하다' },
+                { english: 'authority', korean: '권한, 당국' },
+                { english: 'acquire', korean: '매입하다, 취득하다' },
+                { english: 'surpass', korean: '~을 능가하다, 넘어서다' },
+                { english: 'run', korean: '~을 운영하다, 경영하다, (공연, 영화 등이) 상연되다, 계속되다' },
+                { english: 'improbable', korean: '사실이라고 생각할 수 없는, 일어날 것 같지 않은' },
+                { english: 'edge', korean: '우위, 유리함, 가장자리, 끝' },
+                { english: 'simultaneously', korean: '동시에' },
+                { english: 'reveal', korean: '밝히다, 누설하다' },
+                { english: 'productivity', korean: '생산성' },
+                { english: 'uncertain', korean: '확신이 없는, 불확실한' },
+                { english: 'premier', korean: '으뜸의, 첫째의' }
+            ],
+            'Day22': [
+                { english: 'agenda', korean: '의제, 의사일정' },
+                { english: 'convene', korean: '(회원 등이) 모이다, (회의가) 개최되다' },
+                { english: 'refute', korean: '부인하다, 반박하다' },
+                { english: 'coordination', korean: '조정' },
+                { english: 'unanimous', korean: '만장일치의, 동의하는' },
+                { english: 'convince', korean: '납득시키다, 확신시키다' },
+                { english: 'consensus', korean: '여론, 일치된 의견' },
+                { english: 'defer', korean: '연기하다, 미루다' },
+                { english: 'usually', korean: '보통, 일반적으로' },
+                { english: 'reschedule', korean: '일정을 바꾸다' },
+                { english: 'meeting', korean: '회의' },
+                { english: 'determine', korean: '알아내다, 결정하다, 확정하다' },
+                { english: 'report', korean: '보고하다, 출두하다, (직장, 회의 등에 도착을) 알리다, 보고서, 보도, 기록' },
+                { english: 'comment', korean: '논평하다, 언급하다' },
+                { english: 'phase', korean: '단계' },
+                { english: 'approve', korean: '승인하다, 찬성하다' },
+                { english: 'enclosed', korean: '동봉된' },
+                { english: 'easy', korean: '쉬운, 용이한' },
+                { english: 'record', korean: '기록, 경력, 이력, 기록하다' },
+                { english: 'suggestion', korean: '제안' },
+                { english: 'attention', korean: '주의, 경청' },
+                { english: 'object', korean: '반대하다' },
+                { english: 'coincidentally', korean: '우연히, 일치하게, 동시 발생적으로' },
+                { english: 'crowded', korean: '붐비는, 복잡한' },
+                { english: 'undergo', korean: '겪다, 거치다, 경험하다' },
+                { english: 'outcome', korean: '결과' },
+                { english: 'narrowly', korean: '주의 깊게, 좁게, 가까스로, 간신히, 겨우' },
+                { english: 'differ', korean: '의견을 달리하다, 다르다' },
+                { english: 'discuss', korean: '논의하다, 토론하다' },
+                { english: 'give', korean: '(연설, 수업 등을) 하다' },
+                { english: 'brief', korean: '~에게 간단히 설명하다, 브리핑하다' },
+                { english: 'distract', korean: '(주의를) 산만하게 하다, 빗기게 하다' },
+                { english: 'emphasis', korean: '강점, 중점' },
+                { english: 'press', korean: '언론(계), 보도기관, 누르다' },
+                { english: 'organize', korean: '준비하다, 조직하다, 정리하다' },
+                { english: 'mention', korean: '언급하다' },
+                { english: 'persuasive', korean: '설득력 있는' },
+                { english: 'understanding', korean: '이해심 있는' },
+                { english: 'adjourn', korean: '(회의 등을) 휴회하다' },
+                { english: 'constructive', korean: '건설적인' },
+                { english: 'preside', korean: '(회의의) 사회를 보다, ~의 의장을 맡아보다' },
+                { english: 'irrelevant', korean: '관계가 없는, 무관한' },
+                { english: 'constraint', korean: '제한' },
+                { english: 'condensed', korean: '요약한, 응축한, 압축한' },
+                { english: 'endorse', korean: '(공개적으로) 지지하다, 보증하다' },
+                { english: 'punctually', korean: '제시간에, 늦지 않게' }
+            ],
+            'Day23': [
+                { english: 'host', korean: '(대회 등을) 주최하다' },
+                { english: 'annual', korean: '매년의' },
+                { english: 'purpose', korean: '목적, 의도' },
+                { english: 'enroll', korean: '등록하다' },
+                { english: 'lecture', korean: '강의, 강연' },
+                { english: 'participant', korean: '참가자' },
+                { english: 'attend', korean: '참석하다, 출석하다' },
+                { english: 'encourage', korean: '장려하다, 복돋아 주다' },
+                { english: 'leave', korean: '휴가, 떠나다, 남기다' },
+                { english: 'recommendation', korean: '추천 사항, 추천' },
+                { english: 'conference', korean: '회의, 회담' },
+                { english: 'schedule', korean: '~을 예정하다' },
+                { english: 'include', korean: '포함하다' },
+                { english: 'result', korean: '결과, (~의 결과로) 되다' },
+                { english: 'register', korean: '등록하다' },
+                { english: 'require', korean: '요구하다' },
+                { english: 'grateful', korean: '감사하는, 고마워하는' },
+                { english: 'overtime', korean: '초과 근무, 야근' },
+                { english: 'responsibility', korean: '부담, 책임, 의무' },
+                { english: 'assent', korean: '찬성하다, 승인, 동의' },
+                { english: 'regard', korean: '~을 ~으로 간주하다, 여기다, 관심, 배려' },
+                { english: 'tentative', korean: '임시적인, 잠정적인' },
+                { english: 'welcome', korean: '반가운, 기꺼이 받아들여지는, 환영하다, 맞이하다' },
+                { english: 'function', korean: '행사, 연회' },
+                { english: 'commence', korean: '시작되다' },
+                { english: 'objective', korean: '목표, 목적' },
+                { english: 'excited', korean: '신이 난, 들뜬' },
+                { english: 'reimbursement', korean: '상환, 변제, 배상' },
+                { english: 'treatment', korean: '대우, 처우' },
+                { english: 'honor', korean: '존경, 명예' },
+                { english: 'emphasize', korean: '강조하다' },
+                { english: 'entry', korean: '(경기 등의) 참가자, 출품물' },
+                { english: 'bonus', korean: '상여금, 보너스' },
+                { english: 'salary', korean: '급여' },
+                { english: 'earn', korean: '(급전 등을) 벌다, (평판을) 받다, 얻다' },
+                { english: 'arise', korean: '(문제 등이) 발생하다, 일어나다' },
+                { english: 'labor', korean: '노동, 일하다, 노동하다' },
+                { english: 'union', korean: '노동조합' },
+                { english: 'existing', korean: '기존의, 현행의' },
+                { english: 'exploit', korean: '착취하다, 부당하게 이용하다' }
+            ],
+            'Day24': [
+                { english: 'appoint', korean: '임명하다, 지명하다' },
+                { english: 'appraisal', korean: '평가' },
+                { english: 'promote', korean: '승진시키다, 촉진하다' },
+                { english: 'skilled', korean: '숙련된, 노련한' },
+                { english: 'radically', korean: '완전히, 철저히' },
+                { english: 'exceptional', korean: '뛰어난, 예외적인' },
+                { english: 'appreciation', korean: '감사' },
+                { english: 'evaluate', korean: '평가하다' },
+                { english: 'suggest', korean: '제안하다, 추천하다' },
+                { english: 'preference', korean: '선호' },
+                { english: 'management', korean: '경영진, 경영' },
+                { english: 'predict', korean: '예측하다' },
+                { english: 'transfer', korean: '보내다, 전근시키다' },
+                { english: 'award', korean: '상, (상 등을) 수여하다' },
+                { english: 'mandatory', korean: '의무적인' },
+                { english: 'competent', korean: '유능한, 능숙한' },
+                { english: 'performance', korean: '실적, 성과, 공연, 연주, 연기' },
+                { english: 'reward', korean: '~에 보답하다, 보상하다, 보상, 포상' },
+                { english: 'search', korean: '찾기, 수색, 조사' },
+                { english: 'inexperienced', korean: '경험 없는, 미숙한' },
+                { english: 'early', korean: '시간상 이른, 조기의' },
+                { english: 'designate', korean: '지명하다, 지정하다' },
+                { english: 'executive', korean: '경영의, 관리의' },
+                { english: 'dedication', korean: '헌신' },
+                { english: 'unanimously', korean: '만장일치로' },
+                { english: 'progress', korean: '진행, 진전, 진척' },
+                { english: 'congratulate', korean: '축하하다' },
+                { english: 'dismiss', korean: '해임하다, 해고하다' },
+                { english: 'independence', korean: '독립성' },
+                { english: 'participation', korean: '참여, 참가, 가입' },
+                { english: 'praise', korean: '칭찬' },
+                { english: 'accomplishment', korean: '성과, 업적' },
+                { english: 'deliberation', korean: '토의, 심의' },
+                { english: 'leadership', korean: '리더십, 지도력' },
+                { english: 'retire', korean: '퇴직하다, 은퇴하다' },
+                { english: 'nomination', korean: '임명, 지명' },
+                { english: 'reorganize', korean: '재편성하다, 재조직하다' },
+                { english: 'serve', korean: '일하다, 근무하다' },
+                { english: 'encouragement', korean: '격려' },
+                { english: 'resignation', korean: '사임, 사직, 사직서' },
+                { english: 'strictly', korean: '엄격히' }
+            ],
+            'Day25': [
+                { english: 'congestion', korean: '(교통의) 체증, 혼잡' },
+                { english: 'alleviate', korean: '완화하다' },
+                { english: 'divert', korean: '우회시키다, 다른 곳으로 돌리다' },
+                { english: 'detour', korean: '우회' },
+                { english: 'fuel', korean: '연료' },
+                { english: 'malfunction', korean: '오작동, 기능 불량' },
+                { english: 'permit', korean: '허락하다, 허가증' },
+                { english: 'transportation', korean: '교통(수단), 운송 수단' },
+                { english: 'opportunity', korean: '기회' },
+                { english: 'clearly', korean: '명확히' },
+                { english: 'ongoing', korean: '계속 진행 중인' },
+                { english: 'detailed', korean: '상세한' },
+                { english: 'alternative', korean: '대안, 대체, 다른, 대신의' },
+                { english: 'obtain', korean: '획득하다, 얻다' },
+                { english: 'designated', korean: '지정된' },
+                { english: 'intersection', korean: '교차로, 교차 지점' },
+                { english: 'equip', korean: '갖추다, 설비하다' },
+                { english: 'commute', korean: '통근하다' },
+                { english: 'downtown', korean: '시내에서, 도심지로' },
+                { english: 'automotive', korean: '자동차의' },
+                { english: 'closure', korean: '폐쇄' },
+                { english: 'vehicle', korean: '차량, 운송 수단' },
+                { english: 'platform', korean: '승강장' },
+                { english: 'official', korean: '공무원, 관리, 공식적인' },
+                { english: 'transit', korean: '교통, 수송' },
+                { english: 'fare', korean: '교통 요금' },
+                { english: 'expense', korean: '비용, 지출' },
+                { english: 'trust', korean: '신뢰, 신임, 믿다, 신뢰하다' },
+                { english: 'head', korean: '(~의 방향으로) 나아가다, 향하게 하다' },
+                { english: 'drive', korean: '(차 등을) 운전하다, 타고 가다, 조종하다' },
+                { english: 'fine', korean: '벌금' },
+                { english: 'pass', korean: '지나가다, 통과하다' },
+                { english: 'securely', korean: '(매듭 등이) 단단하게, 튼튼하게' },
+                { english: 'prominently', korean: '눈에 잘 띄게, 두드러지게' },
+                { english: 'reserved', korean: '예약된, 예약한, 지정된' },
+                { english: 'average', korean: '평균치, 평균' },
+                { english: 'collision', korean: '충돌' },
+                { english: 'tow', korean: '(차를) 견인하다' },
+                { english: 'reverse', korean: '뒤의, 반대의' },
+                { english: 'obstruct', korean: '(전망 등을) 가리다, 차단하다, (도로 등을) 막다' }
+            ],
+            'Day26': [
+                { english: 'delinquent', korean: '(세금 등이) 연체된, 미불의' },
+                { english: 'overdue', korean: '(지불, 반납 등의) 기한이 지난, 지불 기한이 넘은' },
+                { english: 'regrettably', korean: '유감스럽게도' },
+                { english: 'balance', korean: '잔고, 차감 잔액' },
+                { english: 'deposit', korean: '입금하다, 예금하다' },
+                { english: 'investigation', korean: '조사' },
+                { english: 'account', korean: '계좌, 설명, 고려, (~의 이유를) 밝히다, 설명하다, (~의 비율을) 차지하다' },
+                { english: 'statement', korean: '명세서, 설명서' },
+                { english: 'amount', korean: '액수, 양' },
+                { english: 'withdrawal', korean: '(예금의) 인출' },
+                { english: 'previously', korean: '이전에' },
+                { english: 'due', korean: '만기가 된, 지불 기일이 된, (금전 등이) ~에게 마땅히 지급되어야 할' },
+                { english: 'receive', korean: '받다, 수취하다' },
+                { english: 'expect', korean: '예상하다, 기대하다' },
+                { english: 'certificate', korean: '증명서, 증서' },
+                { english: 'document', korean: '서류, 문서, 기록하다, 문서를 작성하다' },
+                { english: 'spending', korean: '소비, 지출' },
+                { english: 'successfully', korean: '성공적으로' },
+                { english: 'bill', korean: '~에게 청구서를 보내다, 청구서, 계산서' },
+                { english: 'pleasure', korean: '즐거움, 기쁨, 영광' },
+                { english: 'study', korean: '연구' },
+                { english: 'summary', korean: '요약, 개요' },
+                { english: 'temporary', korean: '임시의' },
+                { english: 'lower', korean: '(양, 가격의) 줄이다' },
+                { english: 'transaction', korean: '거래, 업무' },
+                { english: 'double', korean: '두 배로 만들다' },
+                { english: 'identification', korean: '신분증, 신분 증명서' },
+                { english: 'dissatisfaction', korean: '불만, 불평' },
+                { english: 'in common', korean: '공통으로, 공동으로' },
+                { english: 'interest', korean: '관심, 관리, 이자' },
+                { english: 'reject', korean: '거절하다, 거부하다' },
+                { english: 'relation', korean: '관계' },
+                { english: 'tentatively', korean: '임시로, 시험적으로' },
+                { english: 'alternatively', korean: '그렇지 않으면, 그 대신에' },
+                { english: 'attentive', korean: '주의 깊은, 세심한' },
+                { english: 'convert', korean: '전환하다, 변환하다' },
+                { english: 'heavily', korean: '몹시, 심하게' },
+                { english: 'loan', korean: '대출, 대출금' },
+                { english: 'unexpected', korean: '예기치 않은' },
+                { english: 'cash', korean: '현금으로 바꾸다' },
+                { english: 'mortgage', korean: '(담보) 대출' },
+                { english: 'payable', korean: '지불해야 하는' },
+                { english: 'personal', korean: '개인의' },
+                { english: 'practice', korean: '관행, 관례, 연습하다, 실습하다' }
+            ],
+            'Day27': [
+                { english: 'investment', korean: '투자, 투자금' },
+                { english: 'lucrative', korean: '수익성 있는, 돈벌이가 되는' },
+                { english: 'inherently', korean: '본질적으로' },
+                { english: 'secure', korean: '확보하다, 얻어 내다, 안전하게 지키다, 고정시키다' },
+                { english: 'foreseeable', korean: '예견할 수 있는' },
+                { english: 'innate', korean: '타고난' },
+                { english: 'property', korean: '재산' },
+                { english: 'on behalf of', korean: '~을 대신해서' },
+                { english: 'lease', korean: '임대차(계약)' },
+                { english: 'sponsor', korean: '후원하다, 후원자' },
+                { english: 'propose', korean: '제안하다' },
+                { english: 'support', korean: '후원, 원조, 지지, 지원하다, 후원하다, 살게 하다, (생명, 기력 등을) 유지하다' },
+                { english: 'distribution', korean: '분배, 배급' },
+                { english: 'consider', korean: '고려하다' },
+                { english: 'nearly', korean: '거의, 대략' },
+                { english: 'consent', korean: '동의, 허락' },
+                { english: 'gratitude', korean: '고마움, 감사' },
+                { english: 'consult', korean: '상의하다, 상담하다' },
+                { english: 'advice', korean: '조언, 충고' },
+                { english: 'partially', korean: '부분적으로, 일부분은' },
+                { english: 'evident', korean: '분명한, 명백한' },
+                { english: 'reliability', korean: '신뢰도, 믿음직함' },
+                { english: 'cautious', korean: '조심하는, 신중한' },
+                { english: 'insight', korean: '식견, 통찰력' },
+                { english: 'portfolio', korean: '포트폴리오, 투자 자산 구성' },
+                { english: 'possible', korean: '가능한, 있음 직한' },
+                { english: 'speculation', korean: '추측' },
+                { english: 'solely', korean: '전적으로' },
+                { english: 'entrepreneur', korean: '사업가' },
+                { english: 'eventually', korean: '결국, 마침내' },
+                { english: 'shareholder', korean: '주주' },
+                { english: 'outlook', korean: '전망' },
+                { english: 'stability', korean: '안정, 안정성' },
+                { english: 'bond', korean: '채권' },
+                { english: 'depreciation', korean: '가치 하락, 화폐의 구매력 저하' },
+                { english: 'increasing', korean: '증가하는' },
+                { english: 'prevalent', korean: '유행하고 있는, 널리 퍼진' },
+                { english: 'rapid', korean: '빠른, 신속한' },
+                { english: 'unprecedented', korean: '전례 없는' },
+                { english: 'yield', korean: '(이윤을) 가져오다, 산출하다' }
+            ],
+            'Day28': [
+                { english: 'furnished', korean: '가구가 비치된' },
+                { english: 'residence', korean: '거주지, 주택' },
+                { english: 'spacious', korean: '(공간이) 넓은' },
+                { english: 'drape', korean: '(방 등을 커튼 등으로) 장식하다' },
+                { english: 'unoccupied', korean: '(집 등이) 비어 있는, 사람이 살지 않는' },
+                { english: 'renovation', korean: '수리, 개조' },
+                { english: 'appropriate', korean: '적당한, 적합한' },
+                { english: 'delay', korean: '연기하다, ~을 뒤로 미루다' },
+                { english: 'community', korean: '지역 사회, 공동체' },
+                { english: 'construction', korean: '건설, 건축' },
+                { english: 'repair', korean: '수리하다' },
+                { english: 'currently', korean: '현재' },
+                { english: 'regularly', korean: '정기적으로' },
+                { english: 'arrange', korean: '배열하다, 정돈하다' },
+                { english: 'location', korean: '장소, 위치' },
+                { english: 'restore', korean: '복구하다, 회복시키다' },
+                { english: 'presently', korean: '현재' },
+                { english: 'numerous', korean: '많은' },
+                { english: 'abandon', korean: '그만두다, 버리다' },
+                { english: 'contractor', korean: '계약자, 도급업자' },
+                { english: 'develop', korean: '개발하다' },
+                { english: 'maintain', korean: '유지하다, 관리하다' },
+                { english: 'densely', korean: '빽빽이, 밀집하여' },
+                { english: 'prepare', korean: '준비하다, 채비를 갖추다' },
+                { english: 'finally', korean: '결국, 마침내' },
+                { english: 'district', korean: '지역, 지구' },
+                { english: 'renewal', korean: '재개발' },
+                { english: 'compulsory', korean: '의무적인' },
+                { english: 'interfere', korean: '방해하다, 해치다' },
+                { english: 'relocation', korean: '이전, 재배치' },
+                { english: 'totally', korean: '완전히, 전적으로' },
+                { english: 'actually', korean: '실제로, 사실은' },
+                { english: 'architect', korean: '건축가' },
+                { english: 'enlarge', korean: '확장하다, 확대하다' },
+                { english: 'install', korean: '설치하다, 장치하다' },
+                { english: 'suppose', korean: '생각하다, 추측하다' },
+                { english: 'permanent', korean: '영구적인' },
+                { english: 'adjacent', korean: '인접한' },
+                { english: 'consist', korean: '구성되다, 이루어지다' },
+                { english: 'utility', korean: '공공시설, 공공요금' }
+            ],
+            'Day29': [
+                { english: 'conserve', korean: '보존하다, 유지하다' },
+                { english: 'chance', korean: '가능성, 기회' },
+                { english: 'forecast', korean: '(날씨의) 예보' },
+                { english: 'waste', korean: '쓰레기, 폐기물' },
+                { english: 'dispose', korean: '처분하다, 처리하다' },
+                { english: 'recycling', korean: '재활용' },
+                { english: 'clear', korean: '맑게 갠, 명백한, 분명한, 또렷하게, 완전히, 떨어져서' },
+                { english: 'damage', korean: '피해, 손해, (물건을) 손상시키다' },
+                { english: 'significant', korean: '상당한, 중대한, 중요한' },
+                { english: 'solution', korean: '해결책' },
+                { english: 'occur', korean: '(일이) 발생하다, 생기다' },
+                { english: 'ideal', korean: '이상적인' },
+                { english: 'preserve', korean: '보존하다, 보호하다' },
+                { english: 'aid', korean: '원조' },
+                { english: 'excessive', korean: '지나친, 과도한' },
+                { english: 'intensively', korean: '집중적으로' },
+                { english: 'vary', korean: '다르다, 다양하다' },
+                { english: 'pleasing', korean: '즐거운, 기분 좋은, 만족스러운' },
+                { english: 'mark', korean: '점수, 평점, 표시, 기념하다, 축하하다' },
+                { english: 'inaccessible', korean: '접근이 불가능한, 이용이 불가능한' },
+                { english: 'disturb', korean: '방해하다' },
+                { english: 'pollutant', korean: '오염 물질' },
+                { english: 'emission', korean: '배기가스, 방출' },
+                { english: 'dense', korean: '빽빽한, 밀집한' },
+                { english: 'environmental', korean: '환경적인' },
+                { english: 'consistent', korean: '일치하는, 지속적인, 한결같은' },
+                { english: 'leak', korean: '누출, 누출량, (물, 빚이) 새게 하다' },
+                { english: 'organization', korean: '단체' },
+                { english: 'continually', korean: '계속해서' },
+                { english: 'contaminate', korean: '오염시키다' },
+                { english: 'disaster', korean: '재난' },
+                { english: 'discharge', korean: '방출하다' },
+                { english: 'resource', korean: '자원' },
+                { english: 'prominent', korean: '유명한, 두드러진' },
+                { english: 'deplete', korean: '고갈시키다' },
+                { english: 'purify', korean: '정화시키다' },
+                { english: 'endangered', korean: '멸종 위기에 처한' },
+                { english: 'extinction', korean: '멸종' },
+                { english: 'drought', korean: '가뭄' },
+                { english: 'inflict', korean: '(고통, 피해를) 입히다, 가하다' },
+                { english: 'migration', korean: '이동, 이주' },
+                { english: 'ecology', korean: '생태, 자연환경' },
+                { english: 'habitat', korean: '(동, 식물의) 서식지' }
+            ],
+            'Day30': [
+                { english: 'fatigue', korean: '피로' },
+                { english: 'checkup', korean: '건강 진단' },
+                { english: 'symptom', korean: '증상' },
+                { english: 'physician', korean: '내과 의사' },
+                { english: 'diagnosis', korean: '진단' },
+                { english: 'prescribe', korean: '(약을) 처방하다' },
+                { english: 'recovery', korean: '회복, 쾌유' },
+                { english: 'recognize', korean: '인정하다, 알아보다' },
+                { english: 'join', korean: '~에 가입하다' },
+                { english: 'comprehensive', korean: '종합적인, 포괄적인' },
+                { english: 'participate', korean: '참여하다, 참가하다' },
+                { english: 'recommend', korean: '권고하다, 추천하다' },
+                { english: 'necessary', korean: '필요한' },
+                { english: 'ability', korean: '능력' },
+                { english: 'operation', korean: '수술' },
+                { english: 'cleanliness', korean: '청결' },
+                { english: 'duration', korean: '지속 기간, 지속' },
+                { english: 'examination', korean: '진찰, 검사' },
+                { english: 'eliminate', korean: '제거하다' },
+                { english: 'easily', korean: '쉽게' },
+                { english: 'dental', korean: '치과의' },
+                { english: 'dietary', korean: '식이 요법의, 규정식의' },
+                { english: 'related', korean: '관련된' },
+                { english: 'transmit', korean: '전염시키다' },
+                { english: 'periodically', korean: '주기적으로' },
+                { english: 'reaction', korean: '반응' },
+                { english: 'simple', korean: '단순한' },
+                { english: 'coverage', korean: '(보험의) 보상 범위, (신문 등의) 보도, 취재 범위' },
+                { english: 'exposure', korean: '노출' },
+                { english: 'pharmaceutical', korean: '제약의, 약학의' },
+                { english: 'premium', korean: '보험료' },
+                { english: 'relieve', korean: '완화시키다' },
+                { english: 'combination', korean: '결합, 연합' },
+                { english: 'conscious', korean: '알고 있는, 자각하고 있는' },
+                { english: 'deprivation', korean: '박탈, 상실' },
+                { english: 'health', korean: '건강, (사회, 기관의) 번영, 안녕' },
+                { english: 'induce', korean: '유발하다' },
+                { english: 'insurance', korean: '보험' },
+                { english: 'nutrition', korean: '영양' },
+                { english: 'prevention', korean: '예방' },
+                { english: 'susceptible', korean: '~에 감염되기 쉬운, 영향 받기 쉬운' },
+                { english: 'uncomfortably', korean: '불쾌하게, 불편하게' }
+            ]
+        };
+
+        let currentCategory = 'meaning';
+        let currentMode = 'english-korean';
+        let currentStudyMode = 'show-all';
+        let selectedDays = [];
+        let currentQuizData = [];
+        let hintUsedQuestions = new Set();
+        let wrongAnswers = [];
+        let isRetryMode = false;
+
+        // Initialize
+        function init() {
+            setupEventListeners();
+        }
+
+        function setupEventListeners() {
+            // Category selection
+            document.querySelectorAll('[data-category]').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    document.querySelectorAll('[data-category]').forEach(b => b.classList.remove('active'));
+                    this.classList.add('active');
+                    currentCategory = this.dataset.category;
+                    
+                    // Update mode based on category
+                    if (currentCategory === 'meaning') {
+                        currentMode = 'english-korean';
+                    } else if (currentCategory === 'english') {
+                        currentMode = 'korean-english';
+                    }
+                });
+            });
+
+            // Study mode selection (only shown in quiz section)
+            document.querySelectorAll('[data-study-mode]').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    document.querySelectorAll('[data-study-mode]').forEach(b => b.classList.remove('active'));
+                    this.classList.add('active');
+                    currentStudyMode = this.dataset.studyMode;
+                });
+            });
+
+            // Day selection
+            document.querySelectorAll('.day-checkbox').forEach(checkbox => {
+                checkbox.addEventListener('change', updateSelectedDays);
+            });
+
+            // Control buttons
+            document.getElementById('selectAllBtn').addEventListener('click', function() {
+                document.querySelectorAll('.day-checkbox:not(:disabled)').forEach(cb => {
+                    cb.checked = true;
+                });
+                updateSelectedDays();
+            });
+
+            document.getElementById('deselectAllBtn').addEventListener('click', function() {
+                document.querySelectorAll('.day-checkbox').forEach(cb => {
+                    cb.checked = false;
+                });
+                updateSelectedDays();
+            });
+
+            document.getElementById('startQuizBtn').addEventListener('click', startQuiz);
+            document.getElementById('backToSelectionBtn').addEventListener('click', backToSelection);
+            document.getElementById('submitBtn').addEventListener('click', submitQuiz);
+            document.getElementById('retryWrongBtn').addEventListener('click', retryWrongAnswers);
+            document.getElementById('newQuizBtn').addEventListener('click', backToSelection);
+        }
+
+        function updateSelectedDays() {
+            selectedDays = Array.from(document.querySelectorAll('.day-checkbox:checked'))
+                .map(cb => cb.value);
+            
+            const info = document.getElementById('selectedInfo');
+            if (selectedDays.length === 0) {
+                info.textContent = '선택된 Day: 없음';
+            } else {
+                const totalWords = selectedDays.reduce((sum, day) => {
+                    return sum + (vocabData[day] ? vocabData[day].length : 0);
+                }, 0);
+                info.textContent = `선택된 Day: ${selectedDays.join(', ')} (총 ${totalWords}문제)`;
+            }
+        }
+
+        function startQuiz() {
+            if (selectedDays.length === 0) {
+                alert('최소 1개 이상의 Day를 선택해주세요!');
+                return;
+            }
+
+            if (currentCategory === 'study') {
+                startStudy();
+                return;
+            }
+
+            // Collect all words from selected days
+            currentQuizData = [];
+            selectedDays.forEach(day => {
+                if (vocabData[day]) {
+                    currentQuizData.push(...vocabData[day]);
+                }
+            });
+
+            // Shuffle
+            currentQuizData.sort(() => Math.random() - 0.5);
+
+            isRetryMode = false;
+            hintUsedQuestions.clear();
+            wrongAnswers = [];
+
+            showQuiz();
+        }
+
+        function startStudy() {
+            if (selectedDays.length === 0) {
+                alert('최소 1개 이상의 Day를 선택해주세요!');
+                return;
+            }
+
+            // Collect all words from selected days
+            currentQuizData = [];
+            selectedDays.forEach(day => {
+                if (vocabData[day]) {
+                    currentQuizData.push(...vocabData[day]);
+                }
+            });
+
+            // Reset to show-all mode
+            currentStudyMode = 'show-all';
+
+            document.getElementById('mainTitle').style.display = 'none';
+            document.getElementById('categorySelection').style.display = 'none';
+            document.getElementById('daySelectionSection').style.display = 'none';
+            document.getElementById('quizSection').style.display = 'block';
+            document.getElementById('submitBtn').style.display = 'none';
+            document.getElementById('studyModeButtons').style.display = 'flex';
+
+            // Reset active button to show-all
+            document.querySelectorAll('[data-study-mode-active]').forEach(b => b.classList.remove('active'));
+            document.querySelector('[data-study-mode-active="show-all"]').classList.add('active');
+
+            const progressInfo = document.getElementById('progressInfo');
+            progressInfo.textContent = `총 ${currentQuizData.length}개 단어`;
+
+            // Setup active study mode button listeners (remove old listeners first)
+            const buttons = document.querySelectorAll('[data-study-mode-active]');
+            buttons.forEach(btn => {
+                const newBtn = btn.cloneNode(true);
+                btn.parentNode.replaceChild(newBtn, btn);
+            });
+            
+            document.querySelectorAll('[data-study-mode-active]').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    document.querySelectorAll('[data-study-mode-active]').forEach(b => b.classList.remove('active'));
+                    this.classList.add('active');
+                    currentStudyMode = this.dataset.studyModeActive;
+                    updateStudyMode();
+                });
+            });
+
+            renderStudyCards();
+        }
+
+        function renderStudyCards() {
+            console.log('=== renderStudyCards called - THIS SHOULD ONLY HAPPEN ONCE ===');
+            const quizGrid = document.getElementById('quizGrid');
+            quizGrid.className = 'study-grid';
+            quizGrid.innerHTML = '';
+
+            currentQuizData.forEach((item, index) => {
+                const card = document.createElement('div');
+                card.className = 'study-card';
+                
+                const englishDiv = document.createElement('div');
+                englishDiv.className = 'study-english';
+                englishDiv.textContent = item.english;
+                englishDiv.addEventListener('click', function() {
+                    if (this.classList.contains('hidden')) {
+                        this.classList.toggle('revealed');
+                    }
+                });
+                
+                const koreanDiv = document.createElement('div');
+                koreanDiv.className = 'study-korean';
+                koreanDiv.textContent = item.korean;
+                koreanDiv.addEventListener('click', function() {
+                    if (this.classList.contains('hidden')) {
+                        this.classList.toggle('revealed');
+                    }
+                });
+                
+                card.appendChild(englishDiv);
+                card.appendChild(koreanDiv);
+                quizGrid.appendChild(card);
+            });
+        }
+
+        function updateStudyMode() {
+            console.log('updateStudyMode called, mode:', currentStudyMode);
+            const allEnglish = document.querySelectorAll('.study-english');
+            const allKorean = document.querySelectorAll('.study-korean');
+            
+            console.log('Found elements - English:', allEnglish.length, 'Korean:', allKorean.length);
+            
+            // Remove all hidden and revealed classes
+            allEnglish.forEach(el => {
+                el.classList.remove('hidden', 'revealed');
+            });
+            allKorean.forEach(el => {
+                el.classList.remove('hidden', 'revealed');
+            });
+            
+            // Add hidden class based on mode
+            if (currentStudyMode === 'hide-english') {
+                allEnglish.forEach(el => el.classList.add('hidden'));
+                console.log('Applied hidden to English');
+            } else if (currentStudyMode === 'hide-korean') {
+                allKorean.forEach(el => el.classList.add('hidden'));
+                console.log('Applied hidden to Korean');
+            } else {
+                console.log('Show all mode - no blur');
+            }
+        }
+
+        function showQuiz() {
+            document.getElementById('mainTitle').style.display = 'none';
+            document.getElementById('categorySelection').style.display = 'none';
+            document.getElementById('daySelectionSection').style.display = 'none';
+            document.getElementById('quizSection').style.display = 'block';
+            document.getElementById('resultSection').style.display = 'none';
+            document.getElementById('studyModeButtons').style.display = 'none';
+
+            const progressInfo = document.getElementById('progressInfo');
+            progressInfo.textContent = `총 ${currentQuizData.length}문제 ${isRetryMode ? '(오답 재시험)' : ''}`;
+
+            const quizGrid = document.getElementById('quizGrid');
+            quizGrid.className = 'quiz-grid';
+            quizGrid.innerHTML = '';
+
+            currentQuizData.forEach((item, index) => {
+                const card = createQuestionCard(item, index);
+                quizGrid.appendChild(card);
+            });
+
+            // Focus first input
+            const firstInput = quizGrid.querySelector('.answer-input');
+            if (firstInput) firstInput.focus();
+        }
+
+        function createQuestionCard(item, index) {
+            const card = document.createElement('div');
+            card.className = 'question-card';
+
+            const questionText = currentMode === 'english-korean' ? item.english : item.korean;
+            const meaningCount = item.korean.split(',').length;
+
+            card.innerHTML = `
+                <span class="question-number">${index + 1}</span>
+                <div class="question-text">${questionText}</div>
+                <div class="meaning-count">뜻 ${meaningCount}개 모두 작성</div>
+                <input type="text" class="answer-input" data-index="${index}" placeholder="답을 입력하세요" autocomplete="off">
+                ${currentMode === 'korean-english' ? `
+                    <button class="hint-btn" data-index="${index}">💡 힌트 보기</button>
+                    <div class="hint-text" id="hint-${index}"></div>
+                ` : ''}
+                <div class="correct-answer" id="answer-${index}"></div>
+            `;
+
+            // Hint button event
+            if (currentMode === 'korean-english') {
+                const hintBtn = card.querySelector('.hint-btn');
+                hintBtn.addEventListener('click', function() {
+                    showHint(index, item.english);
+                    hintUsedQuestions.add(index);
+                    this.disabled = true;
+                });
+            }
+
+            return card;
+        }
+
+        function showHint(index, english) {
+            const hintDiv = document.getElementById(`hint-${index}`);
+            hintDiv.textContent = `힌트: ${english.charAt(0)}...`;
+        }
+
+        function submitQuiz() {
+            const inputs = document.querySelectorAll('.answer-input');
+            let correctCount = 0;
+            wrongAnswers = [];
+
+            inputs.forEach((input, index) => {
+                const userAnswer = input.value.trim();
+                const item = currentQuizData[index];
+                const correctAnswer = currentMode === 'english-korean' ? item.korean : item.english;
+
+                let isCorrect = false;
+                let isPartial = false;
+                let matchedMeanings = [];
+                let unmatchedMeanings = [];
+
+                if (currentMode === 'english-korean') {
+                    // For english-korean: check if all meanings are matched
+                    const meanings = correctAnswer.split(',').map(m => m.trim());
+                    const userMeanings = userAnswer.split(',').map(m => m.trim().toLowerCase());
+                    
+                    meanings.forEach(meaning => {
+                        const normalized = meaning.toLowerCase();
+                        if (userMeanings.includes(normalized)) {
+                            matchedMeanings.push(meaning);
+                        } else {
+                            unmatchedMeanings.push(meaning);
+                        }
+                    });
+
+                    if (matchedMeanings.length === meanings.length) {
+                        isCorrect = true;
+                    } else if (matchedMeanings.length > 0) {
+                        isPartial = true;
+                    }
+                } else {
+                    // For korean-english: exact match
+                    const normalizedUser = normalizeAnswer(userAnswer);
+                    const normalizedCorrect = normalizeAnswer(correctAnswer);
+                    isCorrect = normalizedUser === normalizedCorrect;
+                }
+
+                // Check if hint was used (auto wrong)
+                if (hintUsedQuestions.has(index)) {
+                    isCorrect = false;
+                    isPartial = false;
+                }
+
+                if (isCorrect) {
+                    input.classList.add('correct');
+                    input.classList.remove('incorrect', 'partial');
+                    correctCount++;
+                } else if (isPartial) {
+                    input.classList.add('partial');
+                    input.classList.remove('correct', 'incorrect');
+                    
+                    // Show which meanings were matched
+                    const answerDiv = document.getElementById(`answer-${index}`);
+                    answerDiv.innerHTML = '<div style="font-size: 12px; margin-top: 5px;">' +
+                        matchedMeanings.map(m => `<div class="meaning-matched">${m}</div>`).join('') +
+                        unmatchedMeanings.map(m => `<div class="meaning-unmatched">✗ ${m}</div>`).join('') +
+                        '</div>';
+                    
+                    wrongAnswers.push({
+                        ...item,
+                        userAnswer: userAnswer,
+                        questionIndex: index,
+                        matchedMeanings: matchedMeanings,
+                        unmatchedMeanings: unmatchedMeanings,
+                        isPartial: true
+                    });
+                } else {
+                    input.classList.add('incorrect');
+                    input.classList.remove('correct', 'partial');
+                    
+                    // Show correct answer
+                    const answerDiv = document.getElementById(`answer-${index}`);
+                    answerDiv.textContent = `정답: ${correctAnswer}`;
+                    
+                    wrongAnswers.push({
+                        ...item,
+                        userAnswer: userAnswer,
+                        questionIndex: index,
+                        isPartial: false
+                    });
+                }
+            });
+
+            showResult(correctCount, currentQuizData.length);
+        }
+
+        function normalizeAnswer(answer) {
+            // Remove spaces, parentheses and convert to lowercase for comparison
+            return answer.toLowerCase().replace(/[\s()]/g, '');
+        }
+
+        function showResult(correct, total) {
+            document.getElementById('mainTitle').style.display = 'none';
+            document.getElementById('categorySelection').style.display = 'none';
+            document.getElementById('quizSection').style.display = 'none';
+            document.getElementById('resultSection').style.display = 'block';
+            
+            // Scroll to top
+            window.scrollTo(0, 0);
+
+            const score = Math.round((correct / total) * 100);
+            const scoreDisplay = document.getElementById('scoreDisplay');
+            scoreDisplay.innerHTML = `${score}점<br><span style="font-size: 0.4em; color: #666;">(${correct} / ${total} 정답)</span>`;
+
+            let message = '';
+            if (score === 100) message = '완벽합니다! 🎉';
+            else if (score >= 80) message = '잘했어요! 👍';
+            else if (score >= 60) message = '좋아요! 💪';
+            else message = '다시 한번 도전해보세요! 📚';
+
+            document.getElementById('scoreMessage').textContent = message;
+
+            // Display all questions in grid
+            const resultGrid = document.getElementById('resultGrid');
+            resultGrid.innerHTML = '';
+
+            const inputs = document.querySelectorAll('.answer-input');
+            inputs.forEach((input, index) => {
+                const item = currentQuizData[index];
+                const userAnswer = input.value.trim();
+                const questionText = currentMode === 'english-korean' ? item.english : item.korean;
+                const correctAnswer = currentMode === 'english-korean' ? item.korean : item.english;
+
+                let isCorrect = false;
+                let isPartial = false;
+                let matchedMeanings = [];
+                let unmatchedMeanings = [];
+
+                if (currentMode === 'english-korean') {
+                    const meanings = correctAnswer.split(',').map(m => m.trim());
+                    const userMeanings = userAnswer.split(',').map(m => m.trim().toLowerCase());
+                    
+                    meanings.forEach(meaning => {
+                        const normalized = meaning.toLowerCase();
+                        if (userMeanings.includes(normalized)) {
+                            matchedMeanings.push(meaning);
+                        } else {
+                            unmatchedMeanings.push(meaning);
+                        }
+                    });
+
+                    if (matchedMeanings.length === meanings.length) {
+                        isCorrect = true;
+                    } else if (matchedMeanings.length > 0) {
+                        isPartial = true;
+                    }
+                } else {
+                    const normalizedUser = normalizeAnswer(userAnswer);
+                    const normalizedCorrect = normalizeAnswer(correctAnswer);
+                    isCorrect = normalizedUser === normalizedCorrect;
+                }
+
+                if (hintUsedQuestions.has(index)) {
+                    isCorrect = false;
+                    isPartial = false;
+                }
+
+                const card = document.createElement('div');
+                let cardClass = 'result-card';
+                let numberClass = 'result-number';
+                
+                if (isCorrect) {
+                    cardClass += ' correct';
+                    numberClass += ' correct';
+                } else if (isPartial) {
+                    cardClass += ' partial';
+                    numberClass += ' partial';
+                } else {
+                    cardClass += ' incorrect';
+                    numberClass += ' incorrect';
+                }
+
+                card.className = cardClass;
+                
+                let answerHTML = '';
+                if (isCorrect) {
+                    answerHTML = `<div class="correct-answer-display">✓ ${correctAnswer}</div>`;
+                } else if (isPartial) {
+                    answerHTML = `
+                        <div class="user-answer">내 답: ${userAnswer || '(답 없음)'}</div>
+                        <div class="partial-answer-display">부분 정답:</div>
+                        ${matchedMeanings.map(m => `<div class="meaning-item meaning-matched">${m}</div>`).join('')}
+                        ${unmatchedMeanings.map(m => `<div class="meaning-item meaning-unmatched">${m}</div>`).join('')}
+                    `;
+                } else {
+                    answerHTML = `
+                        <div class="user-answer">내 답: ${userAnswer || '(답 없음)'}</div>
+                        <div class="wrong-answer-display">✗ 정답: ${correctAnswer}</div>
+                    `;
+                }
+
+                card.innerHTML = `
+                    <span class="${numberClass}">${index + 1}</span>
+                    <div class="result-question">${questionText}</div>
+                    <div class="result-answer-section">
+                        ${answerHTML}
+                    </div>
+                `;
+
+                resultGrid.appendChild(card);
+            });
+
+            // Show/hide retry button
+            if (wrongAnswers.length > 0) {
+                document.getElementById('retryWrongBtn').style.display = 'inline-block';
+            } else {
+                document.getElementById('retryWrongBtn').style.display = 'none';
+            }
+        }
+
+        function retryWrongAnswers() {
+            if (wrongAnswers.length === 0) return;
+
+            currentQuizData = wrongAnswers.map(item => ({
+                english: item.english,
+                korean: item.korean
+            }));
+
+            currentQuizData.sort(() => Math.random() - 0.5);
+            
+            isRetryMode = true;
+            hintUsedQuestions.clear();
+            wrongAnswers = [];
+
+            showQuiz();
+        }
+
+        function backToSelection() {
+            document.getElementById('mainTitle').style.display = 'block';
+            document.getElementById('categorySelection').style.display = 'flex';
+            document.getElementById('daySelectionSection').style.display = 'block';
+            document.getElementById('quizSection').style.display = 'none';
+            document.getElementById('resultSection').style.display = 'none';
+            document.getElementById('submitBtn').style.display = 'block';
+            document.getElementById('studyModeButtons').style.display = 'none';
+            
+            // Reset quiz grid class
+            const quizGrid = document.getElementById('quizGrid');
+            quizGrid.className = 'quiz-grid';
+            
+            // Reset
+            hintUsedQuestions.clear();
+            wrongAnswers = [];
+            isRetryMode = false;
+        }
+
+        // Initialize on load
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', init);
+        } else {
+            init();
+        }
+    </script>
+</body>
+</html>
